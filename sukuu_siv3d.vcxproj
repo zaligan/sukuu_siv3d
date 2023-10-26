@@ -149,6 +149,7 @@
     <Image Include="App\example\windmill.png" />
     <Image Include="App\icon.ico" />
     <Image Include="App\picture\pJetTex.png" />
+    <Image Include="App\picture\敵\GalagianArtwork\raw\enemies\fighter.png" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="App\Resource.rc" />

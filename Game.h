@@ -21,7 +21,7 @@ private:
 
 
 	//const Texture houseTex{ U"🏚️"_emoji };
-	//const Texture pJetTex{ U"picture/pJetTex.png" };
+	const Texture pJetTex{ U"picture/敵/GalagianArtwork/raw/enemies/fighter.png" };
 	//const double pJetScale = 0.02;
 	//const double pSpeed = 300.0;//プレイヤーの移動速度
 	//const int sidePanelWidth = 200.0;//両脇パネルの横幅

@@ -24,12 +24,10 @@ void Game::update()
 
 		Shape2D::Star(50, Vec2{ 200, 200 }).draw(Palette::Yellow);
 	}
-
 }
 
 void Game::draw() const
 {
 	Scene::SetBackground(ColorF{ 0.6, 0.8, 0.7 });
-	
-	
+	pJetTex.drawAt(100,100);
 }

@@ -227,6 +227,9 @@
     <Image Include="App\picture\pJetTex.png">
       <Filter>Resource Files</Filter>
     </Image>
+    <Image Include="App\picture\敵\GalagianArtwork\raw\enemies\fighter.png">
+      <Filter>Resource Files</Filter>
+    </Image>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="App\Resource.rc">
