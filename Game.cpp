@@ -4,18 +4,25 @@
 Game::Game(const InitData& init)
 	: IScene{ init }
 {
-		
+	
 }
 
 
 void Game::update()
 {
-	pJet_pos = OffsetCircular();
+	deltaTime = Scene::DeltaTime();
+
 	if (KeyA.pressed())
-		pJet_pos.x -= 10.0;
-	
+		degrees -= pJet_speed * deltaTime;
+	if (KeyD.pressed())
+		degrees += pJet_speed * deltaTime;
+	pJet_pos = OffsetCircular({ 0,0 }, earth_r, degrees);
+	radians = degrees * Math::Pi / 180;
+	camera.setTargetCenter({0,-earth_r});
+	Vec2 temp{ OffsetCircular({ 0,0 }, earth_r, 180) };
+	mat = Mat3x2::Rotate(-degrees, {0,0});
 	camera.update();
-	camera.setTargetCenter(pJet_pos);
+	
 }
 
 void Game::draw() const
@@ -25,12 +32,19 @@ void Game::draw() const
 
 	{
 		// 2D カメラの設定から Transformer2D を作成
-		const auto t = camera.createTransformer();
+		const auto t0 = camera.createTransformer();
+	
+	
+		const Transformer2D t1{ mat,TransformCursor::Yes };
 
 		Circle{ 0, 0, earth_r }.drawFrame(2);
 
 		cat.drawAt(0, 0);
-		pJetTex.drawAt(pJet_pos);
+		cat.drawAt(0, earth_r);
+		cat.drawAt(earth_r, 0);
+		
+		pJetTex.rotated(degrees).drawAt(pJet_pos);
+	
 		
 	}
 }
