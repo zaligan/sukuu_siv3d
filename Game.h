@@ -14,6 +14,8 @@ public:
 
 private:
 	const Texture cat{ U"🐈"_emoji };
+	const double earth_r = 1000.0;
+	Vec2 pJet_pos{0,0};
 
 	// 2D カメラ
 	// 初期設定: 中心 (0, 0), ズームアップ倍率 1.0
