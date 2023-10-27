@@ -13,6 +13,11 @@ public:
 	void draw() const override;
 
 private:
-	Rect button{ 300,300,300,80 };
-	
+	RoundRect button_S{ 325,350,150,60,10 };
+	RoundRect button_E{ 325,420,150,60,10 };
+
+	Font font{ 35 };
+
+	/*Transition transition_s{0.4s, 0.2s};
+	Transition transition_s{ 0.4s, 0.2s };*/
 };
