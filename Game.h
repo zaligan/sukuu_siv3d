@@ -28,6 +28,7 @@ private:
 	const Texture pBullet_tex{ U"picture/敵/GalagianArtwork/raw/projectiles/shotsmall.png" };
 	Array<Vec2> pBullet_deg_r;
 	Array<Circle> pBullet_arr;
+	//test
 	const double pBullet_r = 4.0;
 	const double pBullet_speed = 400.0;
 	const double pShotCoolTime = 0.1;
