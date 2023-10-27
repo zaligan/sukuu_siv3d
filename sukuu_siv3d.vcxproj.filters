@@ -136,6 +136,12 @@
     <Filter Include="Resource Files\engine\font\min">
       <UniqueIdentifier>{1b103960-f11a-4515-b4f1-f59333ce00d9}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Resource Files\picture">
+      <UniqueIdentifier>{aa7d44ee-78bc-4f22-9d84-9f6126fdf7c5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files\music">
+      <UniqueIdentifier>{d784a5a6-4312-4b8f-b0f6-6fea1c31dc71}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
@@ -224,11 +230,20 @@
     <Image Include="App\example\obj\siv3d-kun-eye.png">
       <Filter>Resource Files\example\obj</Filter>
     </Image>
-    <Image Include="App\picture\pJetTex.png">
-      <Filter>Resource Files</Filter>
-    </Image>
     <Image Include="App\picture\敵\GalagianArtwork\raw\enemies\fighter.png">
-      <Filter>Resource Files</Filter>
+      <Filter>Resource Files\picture</Filter>
+    </Image>
+    <Image Include="App\picture\敵\GalagianArtwork\raw\player\ship1.png">
+      <Filter>Resource Files\picture</Filter>
+    </Image>
+    <Image Include="App\picture\敵\GalagianArtwork\raw\projectiles\shotoval.png">
+      <Filter>Resource Files\picture</Filter>
+    </Image>
+    <Image Include="App\picture\敵\GalagianArtwork\raw\enemies\kamikaze.png">
+      <Filter>Resource Files\picture</Filter>
+    </Image>
+    <Image Include="App\picture\敵\GalagianArtwork\raw\projectiles\shotsmall.png">
+      <Filter>Resource Files\picture</Filter>
     </Image>
   </ItemGroup>
   <ItemGroup>
@@ -754,6 +769,9 @@
     </Media>
     <Media Include="App\example\shot.mp3">
       <Filter>Resource Files\example</Filter>
+    </Media>
+    <Media Include="App\music\発射2.mp3">
+      <Filter>Resource Files\music</Filter>
     </Media>
   </ItemGroup>
   <ItemGroup>
