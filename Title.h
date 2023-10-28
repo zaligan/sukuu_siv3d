@@ -18,6 +18,5 @@ private:
 
 	Font font{ 35 };
 
-	/*Transition transition_s{0.4s, 0.2s};
-	Transition transition_s{ 0.4s, 0.2s };*/
+	const Texture titleBackTex{ U"picture/AsteriaSalvare　タイトル画面.jpg" };
 };

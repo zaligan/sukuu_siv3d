@@ -20,7 +20,7 @@ void Title::update()
 void Title::draw() const
 {
 	Scene::SetBackground(ColorF{ 0.9, 0.95, 1.0 });
-
+	titleBackTex.scaled(0.9).drawAt(Scene::Center());
 	button_S.draw(Palette::Orange);
 	button_E.draw(Palette::Skyblue);
 

@@ -245,6 +245,9 @@
     <Image Include="App\picture\敵\GalagianArtwork\raw\projectiles\shotsmall.png">
       <Filter>Resource Files\picture</Filter>
     </Image>
+    <Image Include="App\picture\AsteriaSalvare　タイトル画面.jpg">
+      <Filter>Resource Files\picture</Filter>
+    </Image>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="App\Resource.rc">
