@@ -18,6 +18,9 @@ private:
 	double deltaTime = 0.0;
 	double degrees = 0.0;
 	double radians = 0.0;
+	int arrNum = 0;
+	//効果音
+	const Audio pShotAud{ U"music/発射2.mp3" };
 
 	//プレイヤー
 	const Texture pJetTex{ U"picture/敵/GalagianArtwork/raw/player/ship1.png" };
@@ -26,8 +29,8 @@ private:
 	Vec2 pJet_pos{ 0,0 };
 
 	const Texture pBullet_tex{ U"picture/敵/GalagianArtwork/raw/projectiles/shotsmall.png" };
-	Array<Vec2> pBullet_deg_r;
-	Array<Circle> pBullet_arr;
+	Array <Vec2> pBullet_posArr;
+	Array <Circle> pBullet_coliArr;
 	//test
 	const double pBullet_r = 4.0;
 	const double pBullet_speed = 400.0;

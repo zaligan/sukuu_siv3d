@@ -20,28 +20,42 @@ void Game::update()
 		degrees += pJet_speed * deltaTime;
 	pJet_pos = OffsetCircular({ 0,0 }, pJet_r, degrees);
 
+
 	//p弾発射処理
 	if ((pShotCoolTime < pShotTimer) && KeySpace.pressed())
 	{
 		pShotTimer = fmod(pShotTimer,pShotCoolTime);
-		pBullet_deg_r << Vec2{ degrees,pJet_r};
+		pBullet_posArr << Vec2{pJet_r + 10 ,degrees};
+		pBullet_coliArr << Circle{ 0,0,pBullet_r };
+		pShotAud.playOneShot();
 	}
-	for (auto& bullet : pBullet_arr)
+	for (auto& arr : pBullet_posArr)
 	{
-		bullet.y += deltaTime * pBullet_speed;
+		arr.x += pBullet_speed * deltaTime;
 	}
-	pBullet_deg_r.remove_if([r = earth_r](const Vec2& b) { return (b.y > (r + 400)); });
-	for (auto& arr : pBullet_arr)
+
+	for (int i = 0; i < pBullet_coliArr.size(); i++)
 	{
-		
+		if (pBullet_posArr.at(i).x > pJet_r + 400)
+		{
+			pBullet_coliArr.erase(pBullet_coliArr.begin() + i);
+			pBullet_posArr.erase(pBullet_posArr.begin() + i);
+			i--;
+			continue;
+		}
+		//p弾Hit処理
+		if (pBullet_coliArr.at(i).intersects(box))
+		{
+			pBullet_coliArr.erase(pBullet_coliArr.begin() + i);
+			pBullet_posArr.erase(pBullet_posArr.begin() + i);
+			i--;
+			continue;
+		}
+		pBullet_coliArr.at(i).setPos(OffsetCircular({ 0,0 }, pBullet_posArr.at(i).x, pBullet_posArr.at(i).y));
 	}
-	//p弾,敵機判定
-	pBullet_arr.remove_if([p = box](const Circle& b) {return b.intersects(p); });
-	for (auto& bullet : pBullet_arr)
-	{
-		if (bullet.intersects(box))
-			Print << U"HIT";
-	}
+
+
+
 	//カメラ計算
 	radians = degrees * Math::Pi / 180;
 	camera.setTargetCenter({0,-pJet_r-80});
@@ -52,7 +66,7 @@ void Game::update()
 
 void Game::draw() const
 {
-	Scene::SetBackground(HSV{ 220, 0.4, 1.0 });
+	Scene::SetBackground(HSV{ 230, 0.6, 0.6 });
 
 	{
 		// 2D カメラの設定から Transformer2D を作成
@@ -63,18 +77,21 @@ void Game::draw() const
 
 		Circle{ 0, 0, earth_r }.draw(Palette::Brown);
 
-		house.drawAt(0, -earth_r);
-		house.rotated(Math::HalfPi).drawAt(earth_r, 0);
-		house.rotated(Math::Pi).drawAt(0, earth_r);
-		house.rotated(-Math::HalfPi).drawAt(-earth_r, 0);
+		house.scaled(0.8).drawAt(0, -earth_r);
+		house.scaled(0.8).rotated(Math::HalfPi).drawAt(earth_r, 0);
+		house.scaled(0.8).rotated(Math::Pi).drawAt(0, earth_r);
+		house.scaled(0.8).rotated(-Math::HalfPi).drawAt(-earth_r, 0);
 
-		for (auto& bullet : pBullet_arr)
+		for (auto& bullet : pBullet_coliArr)
 		{
-			pBullet_tex.rotated(degrees).drawAt(OffsetCircular({0,0}, bullet.y, bullet.x));
 			bullet.draw(Palette::Black);
+			pBullet_tex.rotated(degrees).drawAt(bullet.center);
 		}
 		
 		pJetTex.rotated(degrees).drawAt(pJet_pos);
+		enemy1_tex.drawAt(0,-earth_r - 170);
+		enemy1_tex.drawAt(30,-earth_r - 160);
+		enemy1_tex.drawAt(-50,-earth_r - 180);
 		
 		box.draw();
 	}
