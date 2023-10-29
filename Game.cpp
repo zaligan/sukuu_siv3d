@@ -1,18 +1,30 @@
 ﻿#include "Game.h"
 
+Enemy::Enemy(Texture tex, Circle collider):tex(tex),collider(collider)
+{
+
+}
+
+Enemy::~Enemy()
+{
+}
+
 // ゲームシーン
 Game::Game(const InitData& init)
 	: IScene{ init }
 {
-	
+	enemy1_coliArr << n1;
+	enemy1_coliArr << n2;
+	enemy1_coliArr << n3;
 }
-
 
 void Game::update()
 {
+	ClearPrint();
+	Print << enemy1_coliArr;
 	deltaTime = Scene::DeltaTime();
 	pShotTimer += deltaTime;
-
+	
 	//p移動処理
 	if (KeyA.pressed())
 		degrees -= pJet_speed * deltaTime;
@@ -36,6 +48,7 @@ void Game::update()
 
 	for (int i = 0; i < pBullet_coliArr.size(); i++)
 	{
+		pBullet_coliArr.at(i).setPos(OffsetCircular({ 0,0 }, pBullet_posArr.at(i).x, pBullet_posArr.at(i).y));
 		if (pBullet_posArr.at(i).x > pJet_r + 400)
 		{
 			pBullet_coliArr.erase(pBullet_coliArr.begin() + i);
@@ -43,7 +56,6 @@ void Game::update()
 			i--;
 			continue;
 		}
-		//p弾Hit処理
 		if (pBullet_coliArr.at(i).intersects(box))
 		{
 			pBullet_coliArr.erase(pBullet_coliArr.begin() + i);
@@ -51,10 +63,23 @@ void Game::update()
 			i--;
 			continue;
 		}
-		pBullet_coliArr.at(i).setPos(OffsetCircular({ 0,0 }, pBullet_posArr.at(i).x, pBullet_posArr.at(i).y));
+		//p弾Hit処理
+		for (auto it = enemy1_coliArr.begin(); it != enemy1_coliArr.end();)
+		{
+			if (pBullet_coliArr.at(i).intersects(*it))
+			{
+				pBullet_coliArr.erase(pBullet_coliArr.begin() + i);
+				pBullet_posArr.erase(pBullet_posArr.begin() + i);
+				i--;
+				it = enemy1_coliArr.erase(it);
+				break;
+			}
+			else
+			{
+				++it;
+			}
+		}
 	}
-
-
 
 	//カメラ計算
 	radians = degrees * Math::Pi / 180;
@@ -72,7 +97,6 @@ void Game::draw() const
 		// 2D カメラの設定から Transformer2D を作成
 		const auto t0 = camera.createTransformer();
 	
-	
 		const Transformer2D t1{ mat,TransformCursor::Yes };
 
 		Circle{ 0, 0, earth_r }.draw(Palette::Brown);
@@ -89,10 +113,12 @@ void Game::draw() const
 		}
 		
 		pJetTex.rotated(degrees).drawAt(pJet_pos);
-		enemy1_tex.drawAt(0,-earth_r - 170);
-		enemy1_tex.drawAt(30,-earth_r - 160);
-		enemy1_tex.drawAt(-50,-earth_r - 180);
-		
+
+		for (auto& enemy : enemy1_coliArr)
+		{
+			//enemy.draw(Palette::Black);
+			enemy1_tex.drawAt(enemy.center);
+		}
 		box.draw();
 	}
 }

@@ -1,6 +1,20 @@
 ﻿# pragma once
 # include "Common.h"
 
+class Enemy
+{
+public:
+	Enemy(Texture tex,Circle collider);
+	~Enemy();
+
+private:
+	Texture tex;
+	Circle collider;
+	Vec2 deg_r;
+	const double maxHP = 100;
+	double currentHP;
+};
+
 // ゲームシーン
 class Game : public App::Scene
 {
@@ -39,6 +53,11 @@ private:
 
 	//敵
 	const Texture enemy1_tex{ U"picture/敵/GalagianArtwork/raw/enemies/kamikaze.png" };
+	Array <Circle> enemy1_coliArr;
+	Circle n1 { 0, -earth_r - 170,10 };
+	Circle n2 { 30, -earth_r - 160,10 };
+	Circle n3 { -50, -earth_r - 180,10 };
+
 	const double enemy1_speed = 1.0;
 
 	const Texture eBullet_tex{ U"picture/敵/GalagianArtwork/raw/projectiles/shotoval.png" };
