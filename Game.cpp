@@ -9,6 +9,11 @@ Enemy::~Enemy()
 {
 }
 
+void Enemy::draw() const
+{
+	tex.drawAt(500,500);
+}
+
 // ゲームシーン
 Game::Game(const InitData& init)
 	: IScene{ init }
@@ -31,7 +36,6 @@ void Game::update()
 	if (KeyD.pressed())
 		degrees += pJet_speed * deltaTime;
 	pJet_pos = OffsetCircular({ 0,0 }, pJet_r, degrees);
-
 
 	//p弾発射処理
 	if ((pShotCoolTime < pShotTimer) && KeySpace.pressed())
@@ -120,5 +124,6 @@ void Game::draw() const
 			enemy1_tex.drawAt(enemy.center);
 		}
 		box.draw();
+		eee.draw();
 	}
 }
