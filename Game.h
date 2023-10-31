@@ -4,16 +4,23 @@
 class Enemy
 {
 public:
-	Enemy(Texture tex,Circle collider);
+	Enemy(Vec2 _r_deg);
+	Enemy(double x,double y);
 	~Enemy();
 	void draw() const;
+	bool calcHP(double damage);
+	void move(Vec2 to);
+	void updatePos();
+	Circle getCollider();
 
 private:
-	Texture tex;
-	Circle collider;
-	Vec2 deg_r;
-	const double maxHP = 100;
+	Texture tex{ U"picture/敵/GalagianArtwork/raw/enemies/kamikaze.png" };
+	Circle collider{ {0,0},10 };
+	Vec2 r_deg{100,100};
+	Vec2 old_r_deg{200,200};
+	double maxHP = 30;
 	double currentHP;
+	Stopwatch stopwatch{ StartImmediately::Yes };
 };
 
 // ゲームシーン
@@ -35,7 +42,8 @@ private:
 	double radians = 0.0;
 	int arrNum = 0;
 	//効果音
-	const Audio pShotAud{ U"music/発射2.mp3" };
+	const Audio pShotAud{ U"music/se_pyun2.mp3" };
+	const Audio eDeathAud{ U"music/maou_se_8bit12.mp3" };
 
 	//プレイヤー
 	const Texture pJetTex{ U"picture/敵/GalagianArtwork/raw/player/ship1.png" };
@@ -50,17 +58,12 @@ private:
 	const double pBullet_r = 4.0;
 	const double pBullet_speed = 400.0;
 	const double pShotCoolTime = 0.1;
+	const double pBullet_damage = 10.0;
 	double pShotTimer = 0.0;
 
 	//敵
 	const Texture enemy1_tex{ U"picture/敵/GalagianArtwork/raw/enemies/kamikaze.png" };
-	Array <Circle> enemy1_coliArr;
-	Circle n1 { 0, -earth_r - 170,10 };
-	Circle n2 { 30, -earth_r - 160,10 };
-	Circle n3 { -50, -earth_r - 180,10 };
-	Enemy eee{ enemy1_tex,n1 };
-
-	const double enemy1_speed = 1.0;
+	Array <Enemy> enemy_arr;
 
 	const Texture eBullet_tex{ U"picture/敵/GalagianArtwork/raw/projectiles/shotoval.png" };
 

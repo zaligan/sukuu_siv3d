@@ -776,6 +776,15 @@
     <Media Include="App\music\発射2.mp3">
       <Filter>Resource Files\music</Filter>
     </Media>
+    <Media Include="App\music\se_pyun2.mp3">
+      <Filter>Resource Files\music</Filter>
+    </Media>
+    <Media Include="App\music\maou_se_8bit12.mp3">
+      <Filter>Resource Files\music</Filter>
+    </Media>
+    <Media Include="App\music\maou_se_8bit22.mp3">
+      <Filter>Resource Files\music</Filter>
+    </Media>
   </ItemGroup>
   <ItemGroup>
     <Font Include="App\example\font\DotGothic16\DotGothic16-Regular.ttf">

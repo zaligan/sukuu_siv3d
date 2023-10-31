@@ -1,8 +1,13 @@
 ﻿#include "Game.h"
 
-Enemy::Enemy(Texture tex, Circle collider):tex(tex),collider(collider)
+Enemy::Enemy(Vec2 r_deg) : r_deg(r_deg), old_r_deg(r_deg), currentHP(maxHP)
 {
-
+    // コンストラクタの本体は空で良い場合
+}
+Enemy::Enemy(double x, double y)
+{
+	r_deg = Vec2{ x,y };
+	currentHP = maxHP;
 }
 
 Enemy::~Enemy()
@@ -11,37 +16,77 @@ Enemy::~Enemy()
 
 void Enemy::draw() const
 {
-	tex.drawAt(500,500);
+	//collider.draw(Palette::Black);
+	tex.rotated(r_deg.y).drawAt(collider.center);
+}
+
+bool Enemy::calcHP(double damage)
+{
+	currentHP -= damage;
+	if (currentHP < 0)
+		return true;
+	return false;
+}
+
+void Enemy::move(Vec2 to)
+{
+	const double t = Min(stopwatch.sF(), 1.0);
+	r_deg = old_r_deg.lerp(to, t);
+	Print << to;
+	Print << old_r_deg;
+	Print << r_deg;
+	/*if (t == 1.0)
+		stopwatch.restart();*/
+}
+
+void Enemy::updatePos()
+{
+	collider.setPos(OffsetCircular({ 0,0 }, r_deg.x, r_deg.y));
+}
+
+Circle Enemy::getCollider()
+{
+	return collider;
 }
 
 // ゲームシーン
 Game::Game(const InitData& init)
 	: IScene{ init }
 {
-	enemy1_coliArr << n1;
-	enemy1_coliArr << n2;
-	enemy1_coliArr << n3;
+
 }
 
 void Game::update()
 {
 	ClearPrint();
-	Print << enemy1_coliArr;
+	Print << enemy_arr.size();
 	deltaTime = Scene::DeltaTime();
 	pShotTimer += deltaTime;
+
+	if (KeyX.down())
+	{
+		enemy_arr << Enemy{ {earth_r + 150,0} };
+	}
+	for (auto& enemy : enemy_arr)
+	{
+		enemy.move({ earth_r + 180 ,1.5 });
+		enemy.updatePos();
+	}
 	
+
 	//p移動処理
 	if (KeyA.pressed())
-		degrees -= pJet_speed * deltaTime;
+		radians -= pJet_speed * deltaTime;
 	if (KeyD.pressed())
-		degrees += pJet_speed * deltaTime;
-	pJet_pos = OffsetCircular({ 0,0 }, pJet_r, degrees);
+		radians += pJet_speed * deltaTime;
+	pJet_pos = OffsetCircular({ 0,0 }, pJet_r, radians);
+	Print << radians;
 
 	//p弾発射処理
 	if ((pShotCoolTime < pShotTimer) && KeySpace.pressed())
 	{
 		pShotTimer = fmod(pShotTimer,pShotCoolTime);
-		pBullet_posArr << Vec2{pJet_r + 10 ,degrees};
+		pBullet_posArr << Vec2{pJet_r + 10 ,radians};
 		pBullet_coliArr << Circle{ 0,0,pBullet_r };
 		pShotAud.playOneShot();
 	}
@@ -49,7 +94,7 @@ void Game::update()
 	{
 		arr.x += pBullet_speed * deltaTime;
 	}
-
+	//p弾移動＆消滅処理
 	for (int i = 0; i < pBullet_coliArr.size(); i++)
 	{
 		pBullet_coliArr.at(i).setPos(OffsetCircular({ 0,0 }, pBullet_posArr.at(i).x, pBullet_posArr.at(i).y));
@@ -68,14 +113,18 @@ void Game::update()
 			continue;
 		}
 		//p弾Hit処理
-		for (auto it = enemy1_coliArr.begin(); it != enemy1_coliArr.end();)
+		for (auto it = enemy_arr.begin(); it != enemy_arr.end();)
 		{
-			if (pBullet_coliArr.at(i).intersects(*it))
+			if (pBullet_coliArr.at(i).intersects(it -> getCollider()))
 			{
 				pBullet_coliArr.erase(pBullet_coliArr.begin() + i);
 				pBullet_posArr.erase(pBullet_posArr.begin() + i);
+				if (it -> calcHP(pBullet_damage))
+				{
+					it = enemy_arr.erase(it);
+					eDeathAud.playOneShot();
+				}
 				i--;
-				it = enemy1_coliArr.erase(it);
 				break;
 			}
 			else
@@ -86,9 +135,8 @@ void Game::update()
 	}
 
 	//カメラ計算
-	radians = degrees * Math::Pi / 180;
 	camera.setTargetCenter({0,-pJet_r-80});
-	mat = Mat3x2::Rotate(-degrees, {0,0});
+	mat = Mat3x2::Rotate(-radians, {0,0});
 	camera.update();
 	
 }
@@ -113,17 +161,15 @@ void Game::draw() const
 		for (auto& bullet : pBullet_coliArr)
 		{
 			bullet.draw(Palette::Black);
-			pBullet_tex.rotated(degrees).drawAt(bullet.center);
+			pBullet_tex.rotated(radians).drawAt(bullet.center);
 		}
 		
-		pJetTex.rotated(degrees).drawAt(pJet_pos);
-
-		for (auto& enemy : enemy1_coliArr)
+		pJetTex.rotated(radians).drawAt(pJet_pos);
+		for (auto& enemy : enemy_arr)
 		{
-			//enemy.draw(Palette::Black);
-			enemy1_tex.drawAt(enemy.center);
+			enemy.draw();
 		}
 		box.draw();
-		eee.draw();
+
 	}
 }
