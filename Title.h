@@ -22,7 +22,7 @@ private:
 	RoundRect st_Button{ Arg::center(stButton_pos),140,55,20 };
 	RoundRect ex_Button{ Arg::center(exButton_pos),140,55,20 };
 
-	const Audio SelectAud{ U"決定ボタンを押す23.mp3" };
+	const Audio SelectAud{ U"music/決定ボタンを押す23.mp3" };
 
 	const Font font{ 52, U"example/font/DotGothic16/DotGothic16-Regular.ttf", FontStyle::Bitmap };
 
