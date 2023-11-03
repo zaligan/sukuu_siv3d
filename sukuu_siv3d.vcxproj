@@ -317,6 +317,8 @@
     <Media Include="App\music\maou_se_8bit12.mp3" />
     <Media Include="App\music\maou_se_8bit22.mp3" />
     <Media Include="App\music\se_pyun2.mp3" />
+    <Media Include="App\music\カーソル移動11.mp3" />
+    <Media Include="App\music\決定ボタンを押す23.mp3" />
     <Media Include="App\music\発射2.mp3" />
   </ItemGroup>
   <ItemGroup>
