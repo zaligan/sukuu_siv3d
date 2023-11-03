@@ -24,6 +24,17 @@ private:
 	Stopwatch stopwatch{ StartImmediately::Yes };
 };
 
+class StarryBackGround
+{
+public:
+	StarryBackGround();
+	~StarryBackGround();
+	void draw() const;
+private:
+
+};
+
+
 // ゲームシーン
 class Game : public App::Scene
 {
@@ -77,6 +88,7 @@ private:
 	Rect box = { Arg::center(0,-600),100,30 };
 
 
+	StarryBackGround starryBack;
 	// 2D カメラ
 	// 初期設定: 中心 (0, 0), ズームアップ倍率 1.0
 	Camera2D camera{ Vec2{ 0, 0 }, 1.5 };

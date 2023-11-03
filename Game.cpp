@@ -49,6 +49,19 @@ Circle Enemy::getCollider()
 	return collider;
 }
 
+StarryBackGround::StarryBackGround()
+{
+}
+
+StarryBackGround::~StarryBackGround()
+{
+}
+
+void StarryBackGround::draw()const
+{
+	Scene::SetBackground(HSV{ 267, 0.99, 0.25 });
+}
+
 // ゲームシーン
 Game::Game(const InitData& init)
 	: IScene{ init }
@@ -155,7 +168,7 @@ void Game::update()
 
 void Game::draw() const
 {
-	Scene::SetBackground(HSV{ 230, 0.6, 0.6 });
+	starryBack.draw();
 
 	{
 		// 2D カメラの設定から Transformer2D を作成

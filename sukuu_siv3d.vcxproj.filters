@@ -248,6 +248,21 @@
     <Image Include="App\picture\AsteriaSalvare　タイトル画面.jpg">
       <Filter>Resource Files\picture</Filter>
     </Image>
+    <Image Include="App\picture\Button\001_02.png">
+      <Filter>Resource Files\picture</Filter>
+    </Image>
+    <Image Include="App\picture\Button\001_05.png">
+      <Filter>Resource Files\picture</Filter>
+    </Image>
+    <Image Include="App\picture\Button\001.png">
+      <Filter>Resource Files\picture</Filter>
+    </Image>
+    <Image Include="App\picture\Button\005.png">
+      <Filter>Resource Files\picture</Filter>
+    </Image>
+    <Image Include="App\picture\Button\005_b.png">
+      <Filter>Resource Files\picture</Filter>
+    </Image>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="App\Resource.rc">
@@ -783,6 +798,12 @@
       <Filter>Resource Files\music</Filter>
     </Media>
     <Media Include="App\music\maou_se_8bit22.mp3">
+      <Filter>Resource Files\music</Filter>
+    </Media>
+    <Media Include="App\music\決定ボタンを押す23.mp3">
+      <Filter>Resource Files\music</Filter>
+    </Media>
+    <Media Include="App\music\カーソル移動11.mp3">
       <Filter>Resource Files\music</Filter>
     </Media>
   </ItemGroup>

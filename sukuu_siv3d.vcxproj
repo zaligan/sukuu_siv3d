@@ -149,6 +149,11 @@
     <Image Include="App\example\windmill.png" />
     <Image Include="App\icon.ico" />
     <Image Include="App\picture\AsteriaSalvare　タイトル画面.jpg" />
+    <Image Include="App\picture\Button\001.png" />
+    <Image Include="App\picture\Button\001_02.png" />
+    <Image Include="App\picture\Button\001_05.png" />
+    <Image Include="App\picture\Button\005.png" />
+    <Image Include="App\picture\Button\005_b.png" />
     <Image Include="App\picture\敵\GalagianArtwork\raw\enemies\fighter.png" />
     <Image Include="App\picture\敵\GalagianArtwork\raw\enemies\kamikaze.png" />
     <Image Include="App\picture\敵\GalagianArtwork\raw\player\ship1.png" />
@@ -312,6 +317,8 @@
     <Media Include="App\music\maou_se_8bit12.mp3" />
     <Media Include="App\music\maou_se_8bit22.mp3" />
     <Media Include="App\music\se_pyun2.mp3" />
+    <Media Include="App\music\カーソル移動11.mp3" />
+    <Media Include="App\music\決定ボタンを押す23.mp3" />
     <Media Include="App\music\発射2.mp3" />
   </ItemGroup>
   <ItemGroup>

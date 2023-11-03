@@ -6,11 +6,12 @@ Title::Title(const InitData& init)
 //毎フレーム実行,主に処理
 void Title::update()
 {
-	if (button_S.leftClicked())
+	if (st_Button.leftClicked())
 	{
+		SelectAud.play();
 		changeScene(State::Game);
 	}
-	if (button_E.leftClicked())
+	if (ex_Button.leftClicked())
 	{
 		System::Exit();
 	}
@@ -19,11 +20,26 @@ void Title::update()
 //updateの後に実行される、主に描画
 void Title::draw() const
 {
-	Scene::SetBackground(ColorF{ 0.9, 0.95, 1.0 });
 	titleBackTex.scaled(0.9).drawAt(Scene::Center());
-	button_S.draw(Palette::Orange);
-	button_E.draw(Palette::Skyblue);
+	/*st_Button.draw();*/
+	/*ex_Button.draw();/*後で消す*/
 
-	font(U"はじめる").draw(330,355);
-	font(U"おわる").draw(350, 425);
+	/*stButton_pic.scaled(0.6).drawAt(stButton_pos);/*001_02.pngの時はscaled(0.7)*/
+	/*exButton_pic.scaled(0.6).drawAt(exButton_pos); */
+	if (st_Button.mouseOver())
+	{
+		font(U"START").draw(Arg::center(stButton_pos), Palette::White);
+	}
+	else
+	{
+		font(U"START").draw(Arg::center(stButton_pos), Palette::Gray);
+	}
+	if (ex_Button.mouseOver())
+	{
+		font(U"EXIT").draw(Arg::center(exButton_pos), Palette::White);
+	}
+	else
+	{
+		font(U"EXIT").draw(Arg::center(exButton_pos), Palette::Gray);
+	}
 }
