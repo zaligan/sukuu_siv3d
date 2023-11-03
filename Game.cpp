@@ -62,6 +62,7 @@ void Game::update()
 	Print << enemy_arr.size();
 	deltaTime = Scene::DeltaTime();
 	pShotTimer += deltaTime;
+	eShotTimer += deltaTime;
 
 	if (KeyX.down())
 	{
@@ -132,6 +133,17 @@ void Game::update()
 				++it;
 			}
 		}
+	}
+	//Enemy処理
+	for (auto& enemy : enemy_arr)
+	{
+		if ((eShotCoolTime < eShotTimer))
+		{
+			eShotTimer = fmod(eShotTimer, eShotCoolTime);
+			eBullet_posArr << Vec2{ enemy.getCollider().top()};
+			pBullet_coliArr << Circle{ 0,0,eBullet_r };
+		}
+		
 	}
 
 	//カメラ計算
