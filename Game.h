@@ -11,6 +11,7 @@ public:
 	bool calcHP(double damage);
 	void move(Vec2 to);
 	void updatePos();
+	void shot(Array<Vec2>& bulletArr);
 	Circle getCollider();
 
 private:
@@ -75,8 +76,14 @@ private:
 	//敵
 	const Texture enemy1_tex{ U"picture/敵/GalagianArtwork/raw/enemies/kamikaze.png" };
 	Array <Enemy> enemy_arr;
-
+	const double eBullet_r = 4.0;
+	const double eBullet_speed = 400.0;
+	const double eShotCoolTime = 4.0;
+	const double eBullet_damage = 10.0;
+	double eShotTimer = 0.0;
 	const Texture eBullet_tex{ U"picture/敵/GalagianArtwork/raw/projectiles/shotoval.png" };
+	Array <Vec2> eBullet_posArr;
+	Array <Circle> eBullet_coliArr;
 
 	Rect box = { Arg::center(0,-600),100,30 };
 
