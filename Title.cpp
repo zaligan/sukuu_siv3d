@@ -8,13 +8,17 @@ void Title::update()
 {
 	if (st_Button.leftClicked())
 	{
-		SelectAud.play();
+		SelectAud_Push.play();
 		changeScene(State::Game);
 	}
 	if (ex_Button.leftClicked())
 	{
 		System::Exit();
 	}
+	/*if (st_Button.mouseOver() || ex_Button.mouseOver())カーソルが上に乗った瞬間だけ音を出すにしたい
+	{
+		SelectAud_Move.playOneShot();
+	}*/
 }
 
 //updateの後に実行される、主に描画
