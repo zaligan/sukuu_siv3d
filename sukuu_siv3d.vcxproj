@@ -117,6 +117,7 @@
   <ItemGroup>
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="Main.cpp" />
+    <ClCompile Include="Result.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
@@ -156,6 +157,14 @@
     <Image Include="App\picture\Button\005_b.png" />
     <Image Include="App\picture\敵\GalagianArtwork\raw\enemies\fighter.png" />
     <Image Include="App\picture\敵\GalagianArtwork\raw\enemies\kamikaze.png" />
+    <Image Include="App\picture\敵\GalagianArtwork\raw\flame\flame0.png" />
+    <Image Include="App\picture\敵\GalagianArtwork\raw\flame\flame1.png" />
+    <Image Include="App\picture\敵\GalagianArtwork\raw\flame\flame2.png" />
+    <Image Include="App\picture\敵\GalagianArtwork\raw\flame\flame3.png" />
+    <Image Include="App\picture\敵\GalagianArtwork\raw\flame\flame4.png" />
+    <Image Include="App\picture\敵\GalagianArtwork\raw\flame\flame5.png" />
+    <Image Include="App\picture\敵\GalagianArtwork\raw\player\shield.png" />
+    <Image Include="App\picture\敵\GalagianArtwork\raw\player\shield1.png" />
     <Image Include="App\picture\敵\GalagianArtwork\raw\player\ship1.png" />
     <Image Include="App\picture\敵\GalagianArtwork\raw\projectiles\shotoval.png" />
     <Image Include="App\picture\敵\GalagianArtwork\raw\projectiles\shotsmall.png" />
@@ -314,6 +323,8 @@
     <Media Include="App\example\shot.mp3" />
     <Media Include="App\example\test.mp3" />
     <Media Include="App\example\video\river.mp4" />
+    <Media Include="App\music\battleBGM.mp3" />
+    <Media Include="App\music\ClickStratButton.mp3" />
     <Media Include="App\music\maou_se_8bit12.mp3" />
     <Media Include="App\music\maou_se_8bit22.mp3" />
     <Media Include="App\music\se_pyun2.mp3" />
@@ -336,6 +347,7 @@
   <ItemGroup>
     <ClInclude Include="Common.h" />
     <ClInclude Include="Game.h" />
+    <ClInclude Include="Result.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="Title.h" />
   </ItemGroup>

@@ -142,6 +142,12 @@
     <Filter Include="Resource Files\music">
       <UniqueIdentifier>{d784a5a6-4312-4b8f-b0f6-6fea1c31dc71}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Resource Files\picture\explosion">
+      <UniqueIdentifier>{7274df40-ab14-47e5-9abc-d5440a446ccf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files\picture\player">
+      <UniqueIdentifier>{87a8a3b2-0b53-4037-8838-92f10595311f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
@@ -154,6 +160,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Game.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Result.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -262,6 +271,30 @@
     </Image>
     <Image Include="App\picture\Button\005_b.png">
       <Filter>Resource Files\picture</Filter>
+    </Image>
+    <Image Include="App\picture\敵\GalagianArtwork\raw\flame\flame0.png">
+      <Filter>Resource Files\picture\explosion</Filter>
+    </Image>
+    <Image Include="App\picture\敵\GalagianArtwork\raw\flame\flame1.png">
+      <Filter>Resource Files\picture\explosion</Filter>
+    </Image>
+    <Image Include="App\picture\敵\GalagianArtwork\raw\flame\flame2.png">
+      <Filter>Resource Files\picture\explosion</Filter>
+    </Image>
+    <Image Include="App\picture\敵\GalagianArtwork\raw\flame\flame3.png">
+      <Filter>Resource Files\picture\explosion</Filter>
+    </Image>
+    <Image Include="App\picture\敵\GalagianArtwork\raw\flame\flame4.png">
+      <Filter>Resource Files\picture\explosion</Filter>
+    </Image>
+    <Image Include="App\picture\敵\GalagianArtwork\raw\flame\flame5.png">
+      <Filter>Resource Files\picture\explosion</Filter>
+    </Image>
+    <Image Include="App\picture\敵\GalagianArtwork\raw\player\shield.png">
+      <Filter>Resource Files\picture\player</Filter>
+    </Image>
+    <Image Include="App\picture\敵\GalagianArtwork\raw\player\shield1.png">
+      <Filter>Resource Files\picture\player</Filter>
     </Image>
   </ItemGroup>
   <ItemGroup>
@@ -806,6 +839,12 @@
     <Media Include="App\music\カーソル移動11.mp3">
       <Filter>Resource Files\music</Filter>
     </Media>
+    <Media Include="App\music\ClickStratButton.mp3">
+      <Filter>Resource Files\music</Filter>
+    </Media>
+    <Media Include="App\music\battleBGM.mp3">
+      <Filter>Resource Files\music</Filter>
+    </Media>
   </ItemGroup>
   <ItemGroup>
     <Font Include="App\example\font\DotGothic16\DotGothic16-Regular.ttf">
@@ -846,6 +885,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Common.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Result.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

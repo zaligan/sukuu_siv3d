@@ -6,6 +6,7 @@ Title::Title(const InitData& init)
 //毎フレーム実行,主に処理
 void Title::update()
 {
+	ClearPrint();
 	if (st_Button.leftClicked())
 	{
 		SelectAud.play();
