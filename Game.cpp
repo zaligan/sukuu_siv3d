@@ -1,64 +1,29 @@
 ﻿#include "Game.h"
 
-
-
-Enemy::Enemy(Vec2 from,Vec2 to) : from(from),to(to), currentHP(maxHP)
-{
-	currentHP = maxHP;
-}
-
-Enemy::~Enemy()
-{
-}
-
-void Enemy::draw() const
-{
-	//collider.draw(Palette::Black);
-	tex.rotated(r_deg.y).drawAt(collider.center);
-}
-
-bool Enemy::calcHP(double damage)
-{
-	currentHP -= damage;
-	if (currentHP <= 0)
-		return true;
-	else
-		return false;
-}
-
-void Enemy::move()
-{
-	const double t = Min(stopwatch.sF() / 10, 1.0);
-	r_deg = from.lerp(to, t);
-	collider.setPos(OffsetCircular({ 0,0 }, r_deg.x,r_deg.y));
-}
-
-Circle Enemy::getCollider()
-{
-	return collider;
-}
-
-Vec2 Enemy::getFrom()
-{
-	return from;
-}
-
-Vec2 Enemy::getTo()
-{
-	return to;
-}
-
-
-
-
-
 // ゲームシーン
 Game::Game(const InitData& init)
 	: IScene{ init }
 {
 	townArr << Town{town0,townHP} << Town{ town1,townHP } << Town{ town2,townHP } << Town{ town3,townHP };
 	pJet_HP = pJet_MaxHP;
+	if (not enemyCSV) // もし読み込みに失敗したら
+	{
+		throw Error{ U"Failed to load `EnemyDataSheat.csv`" };
+	}
+	for (size_t i =1;i<enemyCount;i++)
+	{
+		ReadEnemyData readLine;
+		readLine.enemyType = Parse<int>(enemyCSV[i][0]);
+		readLine.movePattern = Parse<int>(enemyCSV[i][1]);
+		readLine.shotPattern = Parse<int>(enemyCSV[i][2]);
+		readLine.spawnTime = Parse<int>(enemyCSV[i][3]);
+		readLine.returnTime = Parse<int>(enemyCSV[i][4]);
+		readLine.r = Parse<double>(enemyCSV[i][5]);
+		readLine.deg = Parse<double>(enemyCSV[i][6]);
+		readEnemyDataArr << readLine;
+	}
 }
+
 
 bool Game::calcPJetHP(Circle bullet, Circle pJet)
 {
@@ -71,22 +36,22 @@ bool Game::calcPJetHP(Circle bullet, Circle pJet)
 }
 
 
-
 void Game::update()
 {
 	gameBGM.play();
 
 	//Print表示
 	ClearPrint();
-	for (int i = 0; i < townArr.size(); i++)
+	for (auto i:step(readEnemyDataArr.size()))
 	{
-		Print << i << U" TownHP:" << townArr.at(i).townHP;
+		Print << i << U" time:" << readEnemyDataArr.at(i).spawnTime;
 	}
 	if (KeyP.pressed())
 		return;
 
 	//時間管理
 	deltaTime = Scene::DeltaTime();
+	sceneTime += deltaTime;
 	pShotTimer += deltaTime;
 	eSpawnTimer += deltaTime;
 
@@ -98,14 +63,6 @@ void Game::update()
 		if (KeyJ.down())
 			changeScene(State::Title);
 		return;
-	}
-
-	if (enemy_arr.size() < 50 && eSpawnCoolTime < eSpawnTimer)
-	{
-		eSpawnTimer -= eSpawnCoolTime;
-		Vec2 fromRandom{Random<double>(earth_r + 150,earth_r + 200),Random<double>(0,2*Math::Pi)};
-		Vec2 toRandom{ Random<double>(earth_r + 150,earth_r + 200),Random<double>(fromRandom.y-Math::HalfPi,fromRandom.y + Math::HalfPi)};
-		enemy_arr << Enemy{ fromRandom,toRandom };
 	}
 
 	shieldFlag = KeyK.pressed();
@@ -167,17 +124,27 @@ void Game::update()
 		}
 	}
 	//Enemy処理
+	//スポーン
+	while (addLine + 2 <= enemyCSV.rows())
+	{
+		if (readEnemyDataArr.at(addLine).spawnTime < sceneTime)
+		{
+			enemy_arr << Enemy{ readEnemyDataArr.at(addLine) };
+			addLine++;
+		}
+		else
+			break;
+	}
+	
 	for (auto& enemy : enemy_arr)
 	{
 		//移動処理
 		enemy.move();
 		//発射処理
 		enemy.eShotTimer += deltaTime;
-		if ((eShotCoolTime < enemy.eShotTimer))
+		if ((enemy.geteShotCoolTime() < enemy.eShotTimer))
 		{
-			enemy.eShotTimer = fmod(enemy.eShotTimer, eShotCoolTime);
-			Vec2 direction = pJet_pos - enemy.getCollider().center;
-			eBulletArr << Bullet{ Circle{0,0,eBullet_r},Vec2{enemy.getCollider().center},direction};
+			enemy.Shot(eBulletArr, pJet_pos);
 		}
 	}
 	//E弾処理
@@ -191,11 +158,12 @@ void Game::update()
 	for (auto it = eBulletArr.begin(); it != eBulletArr.end();)
 	{
 		bool exsit = false;
-		for (auto& town : townArr)
+		for (auto i : step(4))
 		{
-			if (it->collider.intersects(town.collider))
+			if (it->collider.intersects(townArr.at(i).collider))
 			{
-				town.townHP -= eBullet_damage;
+				townArr.at(i).townHP -= eBullet_damage;
+				hpBars[i].damage(eBullet_damage);
 				it = eBulletArr.erase(it);
 				exsit = true;
 				break;
@@ -228,6 +196,11 @@ void Game::update()
 		{
 			gameOverFlag = true;
 		}
+	}
+	//HPBar
+	for (size_t i = 0; i < hpBars.size(); ++i)
+	{
+		hpBars[i].update();
 	}
 
 	//カメラ計算
@@ -280,6 +253,15 @@ void Game::draw() const
 			eBullet_tex.drawAt(eBullet.position);
 		}
 	}
+	//HPBar
+	for (size_t i = 0; i < hpBars.size(); i++)
+	{
+		const double x =i * 200;
+		const double y = 500;
+		const RectF rect = RectF{ x, y, 150, 16 }.movedBy(25,0);
+		hpBars[i].draw(rect);
+	}
+	//GameOver
 	if (gameOverFlag)
 	{
 		font(U"GMAE OVER").drawAt(Scene::Center(), Palette::Gray);

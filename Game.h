@@ -1,33 +1,7 @@
 ﻿# pragma once
 # include "Common.h"
-
-class Enemy
-{
-public:
-	Enemy(Vec2 _r_deg,Vec2 to);
-	~Enemy();
-	void draw() const;
-	bool calcHP(double damage);
-	void move();
-	double eShotTimer = 0.0;
-	Circle getCollider();
-	Vec2 r_deg{ 100,100 };
-	double currentHP = 30;
-	double animaTime = 0.0;
-	Vec2 getFrom();
-	Vec2 getTo();
-
-private:
-	Texture tex{ U"picture/敵/GalagianArtwork/raw/enemies/kamikaze.png" };
-	Circle collider{ {0,0},10 };
-	Vec2 from;
-	Vec2 to;
-	double maxHP = 30;
-	Stopwatch stopwatch{ StartImmediately::Yes };
-};
-
-
-
+#include"Enemy.h"
+#include"HPBar.h"
 // ゲームシーン
 class Game : public App::Scene
 {
@@ -42,7 +16,7 @@ public:
 	void draw() const override;
 
 private:
-	const double earth_r = 400.0;
+	
 	const Circle earth { 0, 0, earth_r };
 	const Texture house{ U"🏠"_emoji };
 	const Texture explosion0{ U"picture/敵/GalagianArtwork/raw/flame/flame0.png" };
@@ -53,6 +27,7 @@ private:
 	const Texture explosion5{ U"picture/敵/GalagianArtwork/raw/flame/flame5.png" };
 	const Font font{ FontMethod::SDF,52,Typeface::Bold };
 	double deltaTime = 0.0;
+	double sceneTime = 0.0;
 	double degrees = 0.0;
 	double radians = 0.0;
 	int arrNum = 0;
@@ -66,14 +41,14 @@ private:
 	struct Town
 	{
 		Circle collider;
-		double townHP;
+		int32 townHP;
 	};
 	Array <Town> townArr;
-	Circle town0{ Arg::center(0,-earth_r),60};
-	Circle town1{ Arg::center(-earth_r,0),60};
-	Circle town2{ Arg::center(0,earth_r),60};
-	Circle town3{ Arg::center(earth_r,0),60};
-	double townHP = 1000.0;
+	Circle town0{ Arg::center(0,-earth_r),houseSize};
+	Circle town1{ Arg::center(-earth_r,0),houseSize };
+	Circle town2{ Arg::center(0,earth_r),houseSize };
+	Circle town3{ Arg::center(earth_r,0),houseSize };
+	int32 townHP = 1000;
 
 	//プレイヤー
 	const Texture pJetTex{ U"picture/敵/GalagianArtwork/raw/player/ship1.png" };
@@ -98,22 +73,22 @@ private:
 	Array <Vec2> pBullet_posArr;
 	Array <Circle> pBullet_coliArr;
 
+	//CSVファイル
+	const CSV enemyCSV{ U"csv/EnemyDataSheat.csv" };
+	Array<ReadEnemyData> readEnemyDataArr;
+	const size_t enemyCount = enemyCSV.rows();
+	size_t addLine = 0;
+
 	//敵
 	const Texture enemy1_tex{ U"picture/敵/GalagianArtwork/raw/enemies/kamikaze.png" };
 	Array <Enemy> enemy_arr;
-	const double eBullet_r = 4.0;
+	
 	const double eBullet_speed = 0.4;
-	const double eShotCoolTime = 3.0;
 	const double eBullet_damage = 10.0;
-	const double eSpawnCoolTime = 0.6;
+	const double eSpawnCoolTime = 0.1;
 	double eSpawnTimer = 0;
 	const Texture eBullet_tex{ U"picture/敵/GalagianArtwork/raw/projectiles/shotoval.png" };
-	struct Bullet
-	{
-		Circle collider;
-		Vec2 position;
-		Vec2 direction;
-	};
+	
 	Array <Bullet> eBulletArr;
 	Array <Vec2> fromToRandomArr;
 
@@ -121,4 +96,10 @@ private:
 	// 初期設定: 中心 (0, 0), ズームアップ倍率 1.0
 	Camera2D camera{ Vec2{ 0, 0 }, 1.5 };
 	Mat3x2 mat = Mat3x2::Identity();
+
+	//HPBar
+	Array<HPBar> hpBars =
+	{
+		HPBar{ townHP },HPBar{ townHP },HPBar{ townHP },HPBar{ townHP }
+	};
 };

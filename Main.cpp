@@ -9,7 +9,7 @@ void Main()
 	manager.add<Title>(State::Title);
 	manager.add<Game>(State::Game);
 
-	//manager.init(State::Game);
+	manager.init(State::Game);
 
 	while (System::Update())
 	{
