@@ -1,6 +1,9 @@
 ﻿#include "Enemy.h"
 
-Enemy::Enemy(ReadEnemyData enemyData) : enemyData(enemyData)
+Enemy::Enemy(ReadEnemyData enemyData, double earth_r, double enemyHouseRange)
+	:enemyData(enemyData)
+	,earth_r(earth_r)
+	,enemyHouseRange(enemyHouseRange)
 {
 	eShotCoolTime = Random(2.7, 3.0);
 	r_deg = { enemyData.r + earth_r+300,enemyData.deg};

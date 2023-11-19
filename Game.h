@@ -1,7 +1,8 @@
 ﻿# pragma once
-# include "Common.h"
+#include"Common.h"
 #include"Enemy.h"
 #include"HPBar.h"
+#include"Anime.h"
 // ゲームシーン
 class Game : public App::Scene
 {
@@ -16,7 +17,9 @@ public:
 	void draw() const override;
 
 private:
-	
+	const Texture backPic{ U"picture/背景/StarryBackPic.png" };
+	const double earth_r = getData().earth_r;
+	const double houseSize = getData().houseSize;
 	const Circle earth { 0, 0, earth_r };
 	const Texture house{ U"🏠"_emoji };
 	const Texture explosion0{ U"picture/敵/GalagianArtwork/raw/flame/flame0.png" };
@@ -35,7 +38,7 @@ private:
 	//効果音
 	const Audio gameBGM{ U"music/battleBGM.mp3" };
 	const Audio pShotAud{ U"music/se_pyun2.mp3" };
-	const Audio eDeathAud{ U"music/maou_se_8bit12.mp3" };
+	
 
 	//街
 	struct Town

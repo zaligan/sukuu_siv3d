@@ -168,10 +168,10 @@
     <ClCompile Include="Result.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="StarrySkyBackground.cpp">
+    <ClCompile Include="Enemy.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Enemy.cpp">
+    <ClCompile Include="Anime.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -266,21 +266,6 @@
     <Image Include="App\picture\AsteriaSalvare　タイトル画面.jpg">
       <Filter>Resource Files\picture</Filter>
     </Image>
-    <Image Include="App\picture\Button\001_02.png">
-      <Filter>Resource Files\picture</Filter>
-    </Image>
-    <Image Include="App\picture\Button\001_05.png">
-      <Filter>Resource Files\picture</Filter>
-    </Image>
-    <Image Include="App\picture\Button\001.png">
-      <Filter>Resource Files\picture</Filter>
-    </Image>
-    <Image Include="App\picture\Button\005.png">
-      <Filter>Resource Files\picture</Filter>
-    </Image>
-    <Image Include="App\picture\Button\005_b.png">
-      <Filter>Resource Files\picture</Filter>
-    </Image>
     <Image Include="App\picture\敵\GalagianArtwork\raw\flame\flame0.png">
       <Filter>Resource Files\picture\explosion</Filter>
     </Image>
@@ -304,6 +289,12 @@
     </Image>
     <Image Include="App\picture\敵\GalagianArtwork\raw\player\shield1.png">
       <Filter>Resource Files\picture\player</Filter>
+    </Image>
+    <Image Include="App\picture\背景\StarryBackPic.png">
+      <Filter>Resource Files\picture</Filter>
+    </Image>
+    <Image Include="App\picture\explosion.png">
+      <Filter>Resource Files\picture</Filter>
     </Image>
   </ItemGroup>
   <ItemGroup>
@@ -822,6 +813,9 @@
     <None Include="App\csv\EnemyDataSheat.csv">
       <Filter>Resource Files\csv</Filter>
     </None>
+    <None Include="config.toml">
+      <Filter>Resource Files\csv</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Media Include="App\example\test.mp3">
@@ -902,16 +896,13 @@
     <ClInclude Include="Result.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="StarrySkyBackground.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
     <ClInclude Include="Enemy.h">
       <Filter>Source Files</Filter>
     </ClInclude>
-    <ClInclude Include="WorldSetting.h">
+    <ClInclude Include="HPBar.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="HPBar.h">
+    <ClInclude Include="Anime.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

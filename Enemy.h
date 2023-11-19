@@ -1,6 +1,6 @@
 ﻿#pragma once
 #include <Siv3D.hpp>
-#include"WorldSetting.h"
+#include"Anime.h"
 
 struct ReadEnemyData
 {
@@ -24,7 +24,7 @@ const double eBullet_r = 4.0;
 class Enemy
 {
 public:
-	Enemy(ReadEnemyData enemyData);
+	Enemy(ReadEnemyData enemyData,double earth_r,double enemyHouseRange);
 	~Enemy();
 	void draw() const;
 	void move();
@@ -40,7 +40,9 @@ public:
 	double currentHP = 30;
 	double animaTime = 0.0;
 	ReadEnemyData getData();
-
+	Audio eDeathAud{ U"music/maou_se_8bit12.mp3" };
+	Texture eExplosion_tex{ U"picture/explosion.png" };
+	Anime explosion_Anime{ eDeathAud,eExplosion_tex, 8, 2, 100,0.35 };
 private:
 	Texture tex{ U"picture/敵/GalagianArtwork/raw/enemies/kamikaze.png" };
 	Circle collider{ {0,0},10 };
@@ -50,4 +52,6 @@ private:
 	Stopwatch stopwatch{ StartImmediately::Yes };
 	ReadEnemyData enemyData;
 	double eShotCoolTime;
+	double earth_r;
+	double enemyHouseRange;
 };

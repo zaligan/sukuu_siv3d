@@ -1,7 +1,10 @@
 ﻿# include "Title.h"
 
 Title::Title(const InitData& init)
-	: IScene{ init } {}
+	: IScene{ init }
+{
+	
+}
 
 //毎フレーム実行,主に処理
 void Title::update()

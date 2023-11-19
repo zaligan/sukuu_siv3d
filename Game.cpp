@@ -42,10 +42,7 @@ void Game::update()
 
 	//Print表示
 	ClearPrint();
-	for (auto i:step(readEnemyDataArr.size()))
-	{
-		Print << i << U" time:" << readEnemyDataArr.at(i).spawnTime;
-	}
+	
 	if (KeyP.pressed())
 		return;
 
@@ -109,12 +106,9 @@ void Game::update()
 			{
 				pBullet_coliArr.erase(pBullet_coliArr.begin() + i);
 				pBullet_posArr.erase(pBullet_posArr.begin() + i);
-				if (it -> calcHP(pBullet_damage))
-				{
-					it = enemy_arr.erase(it);
-					eDeathAud.playOneShot();
-				}
 				i--;
+				it->calcHP(pBullet_damage);
+				++it;
 				break;
 			}
 			else
@@ -129,23 +123,32 @@ void Game::update()
 	{
 		if (readEnemyDataArr.at(addLine).spawnTime < sceneTime)
 		{
-			enemy_arr << Enemy{ readEnemyDataArr.at(addLine) };
+			enemy_arr << Enemy{ readEnemyDataArr.at(addLine),getData().earth_r,getData().enemyHouseRange};
 			addLine++;
 		}
 		else
 			break;
 	}
 	
-	for (auto& enemy : enemy_arr)
+	for (auto it = enemy_arr.begin(); it != enemy_arr.end();)
 	{
-		//移動処理
-		enemy.move();
-		//発射処理
-		enemy.eShotTimer += deltaTime;
-		if ((enemy.geteShotCoolTime() < enemy.eShotTimer))
+		if (it->currentHP <= 0)
 		{
-			enemy.Shot(eBulletArr, pJet_pos);
+			if (it->explosion_Anime.update())
+			{
+				it = enemy_arr.erase(it);
+				continue;
+			}
 		}
+		//移動処理
+		it->move();
+		//発射処理
+		it->eShotTimer += deltaTime;
+		if ((it->geteShotCoolTime() < it->eShotTimer))
+		{
+			it->Shot(eBulletArr, pJet_pos);
+		}
+		++it;
 	}
 	//E弾処理
 	//移動処理
@@ -214,13 +217,12 @@ void Game::update()
 
 void Game::draw() const
 {
-	Scene::SetBackground(HSV{ 267, 0.99, 0.25 });
 	{
 		// 2D カメラの設定から Transformer2D を作成
 		const auto t0 = camera.createTransformer();
-	
 		const Transformer2D t1{ mat,TransformCursor::Yes };
 
+		backPic.scaled(1.0).drawAt(0,0);
 		//ステージ
 		earth.draw(Palette::Brown);
 		house.scaled(0.8).drawAt(0, -earth_r);
@@ -245,6 +247,11 @@ void Game::draw() const
 			if (enemy.currentHP > 0)
 			{
 				enemy.draw();
+			}
+			else
+			{
+				Circle{ OffsetCircular({ 0,0 }, enemy.r_deg.x, enemy.r_deg.y * Math::Pi / 180),10, }.draw(Palette::Pink);
+				enemy.explosion_Anime.draw(OffsetCircular({ 0,0 }, enemy.r_deg.x, enemy.r_deg.y * Math::Pi /180));
 			}
 		}
 		//敵弾

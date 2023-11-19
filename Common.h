@@ -12,10 +12,9 @@ enum class State
 struct GameData
 {
 	// 直前のゲームのスコア
-	Optional<int32> lastGameScore;
-
-	// ハイスコア
-	Array<int32> highScores = { 50, 40, 30, 20, 10 };
+	double earth_r;
+	double houseSize;
+	double enemyHouseRange;
 };
 
 using App = SceneManager<State, GameData>;
