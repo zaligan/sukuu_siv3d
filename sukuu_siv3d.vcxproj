@@ -191,6 +191,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include=".editorconfig" />
+    <None Include="App\config.toml" />
     <None Include="App\csv\EnemyDataSheat.csv" />
     <None Include="App\dll\soundtouch\SoundTouch_x64.dll" />
     <None Include="App\engine\font\fontawesome\fontawesome-brands.otf.zstdcmp" />
@@ -318,7 +319,6 @@
     <None Include="App\example\toml\config.toml" />
     <None Include="App\example\toml\test.toml" />
     <None Include="App\example\zip\zip_test.zip" />
-    <None Include="config.toml" />
   </ItemGroup>
   <ItemGroup>
     <Media Include="App\example\shot.mp3" />

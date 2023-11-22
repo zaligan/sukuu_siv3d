@@ -1,41 +1,42 @@
 ﻿#include "Anime.h"
 
 
-Anime::Anime(const Texture& texture, int majorSize, int rowSize, int frame) :
+Anime::Anime(const Texture& texture, int majorSize, int rowSize, double frmTime) :
 	m_texture(texture),
 	m_majorSize(majorSize),
 	m_rowSize(rowSize),
-	m_frame(frame),
+	m_frmTime(frmTime),
 	m_index({ 0,0 }),
 	m_count(0) {}
 
-Anime::Anime(const Audio& audio, const Texture& texture, int majorSize, int rowSize, int frame) :
+Anime::Anime(const Audio& audio, const Texture& texture, int majorSize, int rowSize, double frmTime) :
 	m_audio(audio),
 	m_texture(texture),
 	m_majorSize(majorSize),
 	m_rowSize(rowSize),
-	m_frame(frame),
+	m_frmTime(frmTime),
 	m_index({ 0,0 }),
 	m_count(0){}
 
-Anime::Anime(const Audio & audio, const Texture & texture, int majorSize, int rowSize, int frame, double resize) :
+Anime::Anime(const Audio & audio, const Texture & texture, int majorSize, int rowSize, double frmTime, double resize) :
 	m_audio(audio),
 	m_texture(texture),
 	m_majorSize(majorSize),
 	m_rowSize(rowSize),
-	m_frame(frame),
+	m_frmTime(frmTime),
 	m_resize(resize),
 	m_index({ 0,0 }),
 	m_count(0){}
 
 bool Anime::update()
 {
-	++m_count;
+	stopwatch.start();
+	const double time = stopwatch.sF();
 	if (m_index.x == 0 && m_index.y == 0 && m_audio)
 		m_audio.play();
-	if (m_count > m_frame)
+	if (time > m_frmTime)
 	{
-		m_count = 0;
+		stopwatch.restart();
 		++m_index.x;
 
 		if (m_index.x >= m_majorSize)

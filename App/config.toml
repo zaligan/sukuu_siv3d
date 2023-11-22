@@ -2,3 +2,7 @@
 earth_r = 400.0
 houseSize = 60.0
 enemyHouseRange = 200.0
+
+[Enemy]
+eShotTimer = 0.0
+maxHP = 20.0

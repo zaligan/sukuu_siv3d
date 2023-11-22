@@ -1,8 +1,8 @@
 ﻿# pragma once
+#include"Anime.h"
 #include"Common.h"
 #include"Enemy.h"
 #include"HPBar.h"
-#include"Anime.h"
 // ゲームシーン
 class Game : public App::Scene
 {
@@ -22,17 +22,10 @@ private:
 	const double houseSize = getData().houseSize;
 	const Circle earth { 0, 0, earth_r };
 	const Texture house{ U"🏠"_emoji };
-	const Texture explosion0{ U"picture/敵/GalagianArtwork/raw/flame/flame0.png" };
-	const Texture explosion1{ U"picture/敵/GalagianArtwork/raw/flame/flame1.png" };
-	const Texture explosion2{ U"picture/敵/GalagianArtwork/raw/flame/flame2.png" };
-	const Texture explosion3{ U"picture/敵/GalagianArtwork/raw/flame/flame3.png" };
-	const Texture explosion4{ U"picture/敵/GalagianArtwork/raw/flame/flame4.png" };
-	const Texture explosion5{ U"picture/敵/GalagianArtwork/raw/flame/flame5.png" };
 	const Font font{ FontMethod::SDF,52,Typeface::Bold };
 	double deltaTime = 0.0;
 	double sceneTime = 0.0;
-	double degrees = 0.0;
-	double radians = 0.0;
+	
 	int arrNum = 0;
 	bool gameOverFlag = false;
 	//効果音
@@ -58,6 +51,7 @@ private:
 	Circle pJet_collider{ 0,0,10 };
 	const double pJet_speed = 0.6;
 	const double pJet_r = earth_r + 60;
+	double radians = 0.0;
 	Vec2 pJet_r_deg;
 	Vec2 pJet_pos{ 0,0 };
 	const double pJet_MaxHP = 1.0;

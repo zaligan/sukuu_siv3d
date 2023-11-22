@@ -813,8 +813,8 @@
     <None Include="App\csv\EnemyDataSheat.csv">
       <Filter>Resource Files\csv</Filter>
     </None>
-    <None Include="config.toml">
-      <Filter>Resource Files\csv</Filter>
+    <None Include="App\config.toml">
+      <Filter>Resource Files</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>
