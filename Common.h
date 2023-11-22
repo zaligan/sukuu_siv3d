@@ -11,7 +11,6 @@ enum class State
 // 共有するデータ
 struct GameData
 {
-	// 直前のゲームのスコア
 	double earth_r;
 	double houseSize;
 	double enemyHouseRange;

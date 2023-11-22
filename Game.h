@@ -1,8 +1,8 @@
 ﻿# pragma once
+#include"Anime.h"
 #include"Common.h"
 #include"Enemy.h"
 #include"HPBar.h"
-#include"Anime.h"
 // ゲームシーン
 class Game : public App::Scene
 {
@@ -22,17 +22,10 @@ private:
 	const double houseSize = getData().houseSize;
 	const Circle earth { 0, 0, earth_r };
 	const Texture house{ U"🏠"_emoji };
-	const Texture explosion0{ U"picture/敵/GalagianArtwork/raw/flame/flame0.png" };
-	const Texture explosion1{ U"picture/敵/GalagianArtwork/raw/flame/flame1.png" };
-	const Texture explosion2{ U"picture/敵/GalagianArtwork/raw/flame/flame2.png" };
-	const Texture explosion3{ U"picture/敵/GalagianArtwork/raw/flame/flame3.png" };
-	const Texture explosion4{ U"picture/敵/GalagianArtwork/raw/flame/flame4.png" };
-	const Texture explosion5{ U"picture/敵/GalagianArtwork/raw/flame/flame5.png" };
 	const Font font{ FontMethod::SDF,52,Typeface::Bold };
 	double deltaTime = 0.0;
 	double sceneTime = 0.0;
-	double degrees = 0.0;
-	double radians = 0.0;
+	
 	int arrNum = 0;
 	bool gameOverFlag = false;
 	//効果音
@@ -54,10 +47,11 @@ private:
 	int32 townHP = 1000;
 
 	//プレイヤー
-	const Texture pJetTex{ U"picture/敵/GalagianArtwork/raw/player/ship1.png" };
+	const Texture pJetTex{ U"picture/Enemy/GalagianArtwork/raw/player/ship1.png" };
 	Circle pJet_collider{ 0,0,10 };
 	const double pJet_speed = 0.6;
 	const double pJet_r = earth_r + 60;
+	double radians = 0.0;
 	Vec2 pJet_r_deg;
 	Vec2 pJet_pos{ 0,0 };
 	const double pJet_MaxHP = 1.0;
@@ -68,11 +62,11 @@ private:
 	const double pShotCoolTime = 0.15;
 	double pShotTimer = 0.0;
 
-	const Texture shieldTex{ U"picture/敵/GalagianArtwork/raw/player/shield1.png" };
+	const Texture shieldTex{ U"picture/Enemy/GalagianArtwork/raw/player/shield1.png" };
 	bool shieldFlag = false;
 	Circle shieldCollider{ 0,0,25 };
 
-	const Texture pBullet_tex{ U"picture/敵/GalagianArtwork/raw/projectiles/shotsmall.png" };
+	const Texture pBullet_tex{ U"picture/Enemy/GalagianArtwork/raw/projectiles/shotsmall.png" };
 	Array <Vec2> pBullet_posArr;
 	Array <Circle> pBullet_coliArr;
 
@@ -82,15 +76,15 @@ private:
 	const size_t enemyCount = enemyCSV.rows();
 	size_t addLine = 0;
 
-	//敵
-	const Texture enemy1_tex{ U"picture/敵/GalagianArtwork/raw/enemies/kamikaze.png" };
+	//Enemy
+	const Texture enemy1_tex{ U"picture/Enemy/GalagianArtwork/raw/enemies/kamikaze.png" };
 	Array <Enemy> enemy_arr;
 	
 	const double eBullet_speed = 0.4;
 	const double eBullet_damage = 10.0;
 	const double eSpawnCoolTime = 0.1;
 	double eSpawnTimer = 0;
-	const Texture eBullet_tex{ U"picture/敵/GalagianArtwork/raw/projectiles/shotoval.png" };
+	const Texture eBullet_tex{ U"picture/Enemy/GalagianArtwork/raw/projectiles/shotoval.png" };
 	
 	Array <Bullet> eBulletArr;
 	Array <Vec2> fromToRandomArr;
