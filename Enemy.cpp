@@ -23,7 +23,7 @@ Enemy::~Enemy()
 void Enemy::draw() const
 {
 	//collider.draw(Palette::Black);
-	tex.rotated(r_deg.y*Math::Pi/180).drawAt(collider.center);
+	TextureAsset(U"enemyTex").rotated(r_deg.y*Math::Pi/180).drawAt(collider.center);
 }
 
 bool Enemy::calcHP(double damage)

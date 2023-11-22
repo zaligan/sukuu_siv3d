@@ -37,14 +37,11 @@ public:
 	Circle getCollider();
 	Vec2 r_deg{ 100,100 };
 	ReadEnemyData getData();
-	Audio eDeathAud{ U"music/maou_se_8bit12.mp3" };
-	Texture eExplosion_tex{ U"picture/explosion.png" };
 	double eShotTimer = 0.0;
 	double currentHP;
-	Anime explosion_Anime{ eDeathAud,eExplosion_tex, 8, 2, 0.03,0.35 };
+	Anime explosion_Anime{ AudioAsset(U"eDeathAud"),TextureAsset(U"eExplosionTex"), 8, 2, 0.03,0.35};
 
 private:
-	Texture tex{ U"picture/敵/GalagianArtwork/raw/enemies/kamikaze.png" };
 	Circle collider{ {0,0},10 };
 	Vec2 from;
 	Vec2 to;
