@@ -1,0 +1,4 @@
+[WorldSetting]
+earth_r = 400.0
+houseSize = 60.0
+enemyHouseRange = 200.0
