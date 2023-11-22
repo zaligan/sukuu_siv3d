@@ -41,7 +41,7 @@ void Game::update()
 	gameBGM.play();
 
 	//Print表示
-	ClearPrint();
+	//ClearPrint();
 	
 	if (KeyP.pressed())
 		return;
@@ -250,7 +250,6 @@ void Game::draw() const
 			}
 			else
 			{
-				Circle{ OffsetCircular({ 0,0 }, enemy.r_deg.x, enemy.r_deg.y * Math::Pi / 180),10, }.draw(Palette::Pink);
 				enemy.explosion_Anime.draw(OffsetCircular({ 0,0 }, enemy.r_deg.x, enemy.r_deg.y * Math::Pi /180));
 			}
 		}

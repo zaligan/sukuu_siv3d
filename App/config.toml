@@ -2,3 +2,10 @@
 earth_r = 400.0
 houseSize = 60.0
 enemyHouseRange = 200.0
+
+[Enemy]
+eShotTimer = 0.0
+maxHP = 20.0
+eDeathAud = "music/maou_se_8bit12.mp3"
+eExplosion_tex = "picture/explosion.png"
+tex = "picture/Enemy/GalagianArtwork/raw/enemies/kamikaze.png"

@@ -1,10 +1,11 @@
 ﻿#include "Enemy.h"
 
-Enemy::Enemy(ReadEnemyData enemyData, double earth_r, double enemyHouseRange)
+Enemy::Enemy(const ReadEnemyData& enemyData, double earth_r, double enemyHouseRange)
 	:enemyData(enemyData)
 	,earth_r(earth_r)
 	,enemyHouseRange(enemyHouseRange)
 {
+	currentHP = maxHP;
 	eShotCoolTime = Random(2.7, 3.0);
 	r_deg = { enemyData.r + earth_r+300,enemyData.deg};
 	from = r_deg;
@@ -22,19 +23,16 @@ Enemy::~Enemy()
 void Enemy::draw() const
 {
 	//collider.draw(Palette::Black);
-	tex.rotated(r_deg.y*Math::Pi/180).drawAt(collider.center);
+	TextureAsset(U"enemyTex").rotated(r_deg.y*Math::Pi/180).drawAt(collider.center);
 }
 
 bool Enemy::calcHP(double damage)
 {
 	currentHP -= damage;
-	if (currentHP <= 0)
-		return true;
-	else
-		return false;
+	return currentHP <= 0;
 }
 
-void Enemy::Shot(Array<Bullet>& eBulletArr,Vec2 pJetPos)
+void Enemy::Shot(Array<Bullet>& eBulletArr, const Vec2& pJetPos)
 {
 	eShotTimer = fmod(eShotTimer, eShotCoolTime);
 	Vec2 directPJet = pJetPos - getCollider().center;
