@@ -56,7 +56,7 @@ private:
 	const double pJet_speed = 0.6;
 	const double pJet_r = earth_r + 60;
 	double radians = 0.0;
-	Vec2 pJet_r_deg;
+	Vec2 pJet_r_deg{pJet_r,0};
 	Vec2 pJet_pos{ 0,0 };
 	const double pJet_MaxHP = 1.0;
 	double pJet_HP;

@@ -15,7 +15,6 @@ struct ReadEnemyData
 struct Bullet
 {
 	Circle collider;
-	Vec2 position;
 	Vec2 direction;
 };
 
@@ -37,8 +36,8 @@ public:
 	Vec2 getTo();
 	Vec2 getPos();
 	Circle getCollider();
-	Vec2 r_deg{ 100,100 };
 	ReadEnemyData getData();
+	Vec2 r_deg{ 100,100 };
 	double eShotTimer = 0.0;
 	double currentHP;
 	Anime explosion_Anime{ AudioAsset(U"eDeathAud"),TextureAsset(U"eExplosionTex"), 8, 2, 0.03,0.35};

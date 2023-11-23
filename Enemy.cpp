@@ -39,9 +39,9 @@ void Enemy::Shot(Array<Bullet>& eBulletArr, const Vec2& pJetPos)
 	Vec2 directPJet = pJetPos - getCollider().center;
 	Vec2 directTown = OffsetCircular({ 0,0 }, earth_r, ((static_cast<int>((r_deg.y + 45.0) / 90) % 4) * 90)*Math::Pi/180) - getCollider().center;
 	if(directPJet.x * directPJet.x + directPJet.y * directPJet.y > directTown.x * directTown.x + directTown.y * directTown.y)
-		eBulletArr << Bullet{ Circle{0,0,eBullet_r},Vec2{getCollider().center},directTown };
+		eBulletArr << Bullet{ Circle{Arg::center(Vec2{getCollider().center}),eBullet_r},directTown};
 	else
-		eBulletArr << Bullet{ Circle{0,0,eBullet_r},Vec2{getCollider().center},directPJet };
+		eBulletArr << Bullet{ Circle{Arg::center(Vec2{getCollider().center}),eBullet_r},directPJet};
 }
 
 void Enemy::move()

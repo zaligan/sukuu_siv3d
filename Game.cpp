@@ -39,6 +39,12 @@ bool Game::calcPJetHP(Circle bullet, Circle pJet)
 void Game::update()
 {
 	gameBGM.play();
+	//Print
+	ClearPrint();
+	for (auto& upg : pUpgrade)
+	{
+		Print << upg;
+	}
 
 	//時間管理
 	deltaTime = Scene::DeltaTime();
@@ -103,7 +109,6 @@ void Game::update()
 				i--;
 				if (it->calcHP(pBullet_damage))
 				{
-					Print << U"HIT";
 					int rondomNum = Random(0, 10);
 					if(rondomNum < 3)
 						itemArr << Item{ rondomNum,it->r_deg };
@@ -172,8 +177,8 @@ void Game::update()
 	//移動処理
 	for (auto& bullet : eBulletArr)
 	{
-		bullet.position += (bullet.direction * eBullet_speed * deltaTime);
-		bullet.collider.setCenter(bullet.position);
+		Vec2 move(bullet.direction * eBullet_speed * deltaTime);
+		bullet.collider.setCenter(bullet.collider.center + move);
 	}
 	//e弾hit
 	for (auto it = eBulletArr.begin(); it != eBulletArr.end();)
@@ -205,7 +210,7 @@ void Game::update()
 		}
 	}
 	//範囲外の弾は削除
-	eBulletArr.remove_if([](const Bullet& b) {return (b.position.x < -1000)||(b.position.x > 1000)|| (b.position.y < -1000) || (b.position.y > 1000); });
+	eBulletArr.remove_if([](const Bullet& b) {return (b.collider.x < -1000)||(b.collider.x > 1000)|| (b.collider.y < -1000) || (b.collider.y > 1000); });
 	//シールド判定
 	if(shieldFlag)
 		eBulletArr.remove_if([s = shieldCollider](const Bullet& b) {return b.collider.intersects(s); });
@@ -274,7 +279,7 @@ void Game::draw() const
 		//敵弾
 		for (auto& eBullet : eBulletArr)
 		{
-			eBullet_tex.drawAt(eBullet.position);
+			eBullet_tex.drawAt(eBullet.collider.center);
 		}
 		//アイテム
 		for (auto& item : itemArr)
