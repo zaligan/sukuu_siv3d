@@ -30,6 +30,8 @@ public:
 	void move();
 	bool calcHP(double damage);
 	void Shot(Array <Bullet> &eBulletArr,const Vec2& pJetPos);
+	void dropItem();
+	bool getDeathFlag();
 	double geteShotCoolTime();
 	Vec2 getFrom();
 	Vec2 getTo();
@@ -51,4 +53,5 @@ private:
 	double eShotCoolTime;
 	double earth_r;
 	double enemyHouseRange;
+	bool deathFlag = false;
 };

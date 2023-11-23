@@ -40,12 +40,6 @@ void Game::update()
 {
 	gameBGM.play();
 
-	//Print表示
-	//ClearPrint();
-	
-	if (KeyP.pressed())
-		return;
-
 	//時間管理
 	deltaTime = Scene::DeltaTime();
 	sceneTime += deltaTime;
@@ -102,12 +96,18 @@ void Game::update()
 		//p弾Hit処理
 		for (auto it = enemy_arr.begin(); it != enemy_arr.end();)
 		{
-			if (pBullet_coliArr.at(i).intersects(it -> getCollider()))
+			if (!it->getDeathFlag() && (pBullet_coliArr.at(i).intersects(it->getCollider())))
 			{
 				pBullet_coliArr.erase(pBullet_coliArr.begin() + i);
 				pBullet_posArr.erase(pBullet_posArr.begin() + i);
 				i--;
-				it->calcHP(pBullet_damage);
+				if (it->calcHP(pBullet_damage))
+				{
+					Print << U"HIT";
+					int rondomNum = Random(0, 10);
+					if(rondomNum < 3)
+						itemArr << Item{ rondomNum,it->r_deg };
+				}
 				++it;
 				break;
 			}
@@ -117,6 +117,24 @@ void Game::update()
 			}
 		}
 	}
+
+	//Item処理
+	for (auto it = itemArr.begin(); it != itemArr.end();)
+	{
+		if (it->r_deg.x > pJet_r)
+			it->r_deg.x -= itemSpeed * deltaTime;
+		Vec2 rectPos = OffsetCircular({ 0,0 }, it->r_deg.x, it->r_deg.y * Math::Pi / 180);
+		Rect collider{Arg::center(lround(rectPos.x),lround(rectPos.y)) ,20,20};
+		if (collider.intersects(pJet_collider))
+		{
+			pUpgrade.at(it->itemType)++;
+			it = itemArr.erase(it);
+			continue;
+		}
+		it++;
+	}
+
+
 	//Enemy処理
 	//スポーン
 	while (addLine + 2 <= enemyCSV.rows())
@@ -132,7 +150,7 @@ void Game::update()
 	
 	for (auto it = enemy_arr.begin(); it != enemy_arr.end();)
 	{
-		if (it->currentHP <= 0)
+		if (it->getDeathFlag())
 		{
 			if (it->explosion_Anime.update())
 			{
@@ -257,6 +275,27 @@ void Game::draw() const
 		for (auto& eBullet : eBulletArr)
 		{
 			eBullet_tex.drawAt(eBullet.position);
+		}
+		//アイテム
+		for (auto& item : itemArr)
+		{
+
+			String texName;
+			switch (item.itemType)
+			{
+			case 0:
+				texName = U"Attack_Item";
+				break;
+			case 1:
+				texName = U"Protect_Item";
+				break;
+			case 2:
+				texName = U"Special_Item";
+				break;
+			default:
+				break;
+			}
+			TextureAsset(texName).scaled(0.04).rotated(item.r_deg.y * Math::Pi/180).drawAt(OffsetCircular({0,0}, item.r_deg.x, item.r_deg.y * Math::Pi / 180));
 		}
 	}
 	//HPBar

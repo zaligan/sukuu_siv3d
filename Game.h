@@ -17,7 +17,6 @@ public:
 	void draw() const override;
 
 private:
-	const Texture backPic{ U"picture/背景/StarryBackPic.png" };
 	const double earth_r = getData().earth_r;
 	const double houseSize = getData().houseSize;
 	const Circle earth { 0, 0, earth_r };
@@ -29,9 +28,14 @@ private:
 	int arrNum = 0;
 	bool gameOverFlag = false;
 	//効果音
-	const Audio gameBGM{ U"music/battleBGM.mp3" };
-	const Audio pShotAud{ U"music/se_pyun2.mp3" };
-	
+	const Audio gameBGM = AudioAsset(U"gameBGM");
+	const Audio pShotAud = AudioAsset(U"pShotAud");
+	const Texture backPic = TextureAsset(U"backPic");
+	const Texture pJetTex = TextureAsset(U"pJetTex");
+	const Texture shieldTex = TextureAsset(U"shieldTex");
+	const Texture pBullet_tex = TextureAsset(U"pBullet_tex");
+	const Texture eBullet_tex = TextureAsset(U"eBullet_tex");
+	const Texture enemy1_tex = TextureAsset(U"enemy1_tex");
 
 	//街
 	struct Town
@@ -47,7 +51,7 @@ private:
 	int32 townHP = 1000;
 
 	//プレイヤー
-	const Texture pJetTex{ U"picture/Enemy/GalagianArtwork/raw/player/ship1.png" };
+	Array <int> pUpgrade = {0,0,0};
 	Circle pJet_collider{ 0,0,10 };
 	const double pJet_speed = 0.6;
 	const double pJet_r = earth_r + 60;
@@ -62,11 +66,10 @@ private:
 	const double pShotCoolTime = 0.15;
 	double pShotTimer = 0.0;
 
-	const Texture shieldTex{ U"picture/Enemy/GalagianArtwork/raw/player/shield1.png" };
+	
 	bool shieldFlag = false;
 	Circle shieldCollider{ 0,0,25 };
-
-	const Texture pBullet_tex{ U"picture/Enemy/GalagianArtwork/raw/projectiles/shotsmall.png" };
+	
 	Array <Vec2> pBullet_posArr;
 	Array <Circle> pBullet_coliArr;
 
@@ -76,18 +79,24 @@ private:
 	const size_t enemyCount = enemyCSV.rows();
 	size_t addLine = 0;
 
+	double itemSpeed = 30.0;
+
 	//Enemy
-	const Texture enemy1_tex{ U"picture/Enemy/GalagianArtwork/raw/enemies/kamikaze.png" };
 	Array <Enemy> enemy_arr;
-	
 	const double eBullet_speed = 0.4;
 	const double eBullet_damage = 10.0;
 	const double eSpawnCoolTime = 0.1;
 	double eSpawnTimer = 0;
-	const Texture eBullet_tex{ U"picture/Enemy/GalagianArtwork/raw/projectiles/shotoval.png" };
-	
 	Array <Bullet> eBulletArr;
 	Array <Vec2> fromToRandomArr;
+
+	struct Item
+	{
+		int itemType;
+		Vec2 r_deg;
+	};
+
+	Array <Item> itemArr;
 
 	// 2D カメラ
 	// 初期設定: 中心 (0, 0), ズームアップ倍率 1.0

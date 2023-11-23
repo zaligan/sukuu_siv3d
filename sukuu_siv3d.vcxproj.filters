@@ -151,6 +151,9 @@
     <Filter Include="Resource Files\csv">
       <UniqueIdentifier>{071ef88a-c5f7-4468-bd21-6e3456ed7ba1}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Resource Files\picture\Item">
+      <UniqueIdentifier>{dd9a86df-3553-4627-802d-8b3973041cd8}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
@@ -295,6 +298,15 @@
     </Image>
     <Image Include="App\picture\explosion.png">
       <Filter>Resource Files\picture</Filter>
+    </Image>
+    <Image Include="App\picture\Item\book_01_blue.png">
+      <Filter>Resource Files\picture\Item</Filter>
+    </Image>
+    <Image Include="App\picture\Item\book_01_green.png">
+      <Filter>Resource Files\picture\Item</Filter>
+    </Image>
+    <Image Include="App\picture\Item\book_01_red.png">
+      <Filter>Resource Files\picture\Item</Filter>
     </Image>
   </ItemGroup>
   <ItemGroup>

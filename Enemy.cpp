@@ -29,7 +29,8 @@ void Enemy::draw() const
 bool Enemy::calcHP(double damage)
 {
 	currentHP -= damage;
-	return currentHP <= 0;
+	deathFlag = currentHP <= 0;
+	return deathFlag;
 }
 
 void Enemy::Shot(Array<Bullet>& eBulletArr, const Vec2& pJetPos)
@@ -59,10 +60,17 @@ ReadEnemyData Enemy::getData()
 {
 	return enemyData;
 }
+
+bool Enemy::getDeathFlag()
+{
+	return deathFlag;
+}
+
 double Enemy::geteShotCoolTime()
 {
 	return eShotCoolTime;
 }
+
 Vec2 Enemy::getFrom()
 {
 	return from;
