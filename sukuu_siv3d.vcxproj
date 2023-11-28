@@ -156,6 +156,11 @@
     <Image Include="App\picture\Item\book_01_blue.png" />
     <Image Include="App\picture\Item\book_01_green.png" />
     <Image Include="App\picture\Item\book_01_red.png" />
+    <Image Include="App\picture\stage\maptile_jimen_sogen_02_center -2.png" />
+    <Image Include="App\picture\stage\maptile_jimen_sogen_02_center.png" />
+    <Image Include="App\picture\stage\shiro_02_gray_roof_blue.png" />
+    <Image Include="App\picture\stage\shiro_02_gray_roof_green.png" />
+    <Image Include="App\picture\stage\shiro_02_gray_roof_red.png" />
     <Image Include="App\picture\敵\GalagianArtwork\raw\enemies\fighter.png" />
     <Image Include="App\picture\敵\GalagianArtwork\raw\enemies\kamikaze.png" />
     <Image Include="App\picture\敵\GalagianArtwork\raw\flame\flame0.png" />

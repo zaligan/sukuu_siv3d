@@ -154,6 +154,9 @@
     <Filter Include="Resource Files\picture\Item">
       <UniqueIdentifier>{dd9a86df-3553-4627-802d-8b3973041cd8}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Resource Files\picture\stage">
+      <UniqueIdentifier>{c76c914e-be15-4da8-b085-3e6efc45c5cc}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
@@ -307,6 +310,21 @@
     </Image>
     <Image Include="App\picture\Item\book_01_red.png">
       <Filter>Resource Files\picture\Item</Filter>
+    </Image>
+    <Image Include="App\picture\stage\maptile_jimen_sogen_02_center -2.png">
+      <Filter>Resource Files\picture\stage</Filter>
+    </Image>
+    <Image Include="App\picture\stage\maptile_jimen_sogen_02_center.png">
+      <Filter>Resource Files\picture\stage</Filter>
+    </Image>
+    <Image Include="App\picture\stage\shiro_02_gray_roof_blue.png">
+      <Filter>Resource Files\picture\stage</Filter>
+    </Image>
+    <Image Include="App\picture\stage\shiro_02_gray_roof_green.png">
+      <Filter>Resource Files\picture\stage</Filter>
+    </Image>
+    <Image Include="App\picture\stage\shiro_02_gray_roof_red.png">
+      <Filter>Resource Files\picture\stage</Filter>
     </Image>
   </ItemGroup>
   <ItemGroup>

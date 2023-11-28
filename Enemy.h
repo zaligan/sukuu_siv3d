@@ -24,12 +24,13 @@ class Enemy
 {
 public:
 	Enemy(const ReadEnemyData& enemyData,double earth_r,double enemyHouseRange);
+	Enemy(const Vec2& spawn,double earth_r,double enemyHouseRange);
 	~Enemy();
+	void init(Vec2 spawn);
 	void draw() const;
 	void move();
 	bool calcHP(double damage);
 	void Shot(Array <Bullet> &eBulletArr,const Vec2& pJetPos);
-	void dropItem();
 	bool getDeathFlag();
 	double geteShotCoolTime();
 	Vec2 getFrom();

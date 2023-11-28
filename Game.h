@@ -10,8 +10,6 @@ public:
 
 	Game(const InitData& init);
 
-	bool calcPJetHP(Circle bullet,Circle pJet);
-
 	void update() override;
 
 	void draw() const override;
@@ -51,24 +49,37 @@ private:
 	int32 townHP = 1000;
 
 	//プレイヤー
-	Array <int> pUpgrade = {0,0,0};
-	Circle pJet_collider{ 0,0,10 };
-	const double pJet_speed = 0.6;
-	const double pJet_r = earth_r + 60;
+	const double playerSize = 1.3;
+	Circle pJet_collider{ 0,0,playerSize * 10 };
+	const double horizSpeed = 0.5;
+	const double vertSpeed = 200.0;
+	//半径方向のプレイヤーが動ける範囲
+	struct MoveRange
+	{
+		double bottom;
+		double top;
+	};
+	const MoveRange moveRange{ earth_r + 60,earth_r + 200 };
+	double pJet_r = moveRange.bottom;
 	double radians = 0.0;
-	Vec2 pJet_r_deg{pJet_r,0};
 	Vec2 pJet_pos{ 0,0 };
 	const double pJet_MaxHP = 1.0;
 	double pJet_HP;
 	const double pBullet_r = 4.0;
 	const double pBullet_speed = 400.0;
 	const double pBullet_damage = 10.0;
-	const double pShotCoolTime = 0.15;
+	const double pShotCoolTime = 0.5;
 	double pShotTimer = 0.0;
-
-	
+	//アップグレード
+	Array <int> pUpgrade = { 0,0,0 };
+	double shotSpeedRate = 0.94;//攻撃強化1ごとにかかる倍率
+	double shieldHealthRate = 15;//防御強化1ごとに加算する耐久値
+	//シールド
+	double shieldSize = 1.0;
 	bool shieldFlag = false;
-	Circle shieldCollider{ 0,0,25 };
+	double baseShieldHealth = 20.0;
+	double shieldHealth = baseShieldHealth;
+	const double shieldRegenerationRate = 1.0;
 	
 	Array <Vec2> pBullet_posArr;
 	Array <Circle> pBullet_coliArr;
@@ -89,7 +100,9 @@ private:
 	double eSpawnTimer = 0;
 	Array <Bullet> eBulletArr;
 	Array <Vec2> fromToRandomArr;
-
+	double spawnTimer = 0;
+	double spawnNum = 0;
+	const double spawnRate = 1.0;
 	struct Item
 	{
 		int itemType;
@@ -99,8 +112,8 @@ private:
 	Array <Item> itemArr;
 
 	// 2D カメラ
-	// 初期設定: 中心 (0, 0), ズームアップ倍率 1.0
-	Camera2D camera{ Vec2{ 0, 0 }, 1.5 };
+	const double cameraScale = 2.0;
+	Camera2D camera{ Vec2{ 0, 0 }, cameraScale };
 	Mat3x2 mat = Mat3x2::Identity();
 
 	//HPBar

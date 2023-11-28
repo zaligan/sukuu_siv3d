@@ -14,6 +14,7 @@ struct GameData
 	double earth_r;
 	double houseSize;
 	double enemyHouseRange;
+	bool testMode;
 };
 
 using App = SceneManager<State, GameData>;
