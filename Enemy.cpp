@@ -5,19 +5,33 @@ Enemy::Enemy(const ReadEnemyData& enemyData, double earth_r, double enemyHouseRa
 	,earth_r(earth_r)
 	,enemyHouseRange(enemyHouseRange)
 {
-	currentHP = maxHP;
-	eShotCoolTime = Random(2.7, 3.0);
-	r_deg = { enemyData.r + earth_r+300,enemyData.deg};
-	from = r_deg;
-	int houseDeg = (static_cast<int>((r_deg.y + 45.0) / 90) % 4) * 90;
-	double enemyRandomDeg = Random(-60, 60) * Math::Pi /180;
-	double enemyRandomR = enemyHouseRange + Random(0,120);
-	double l = sqrt((earth_r * earth_r) + (enemyRandomR * enemyRandomR) - 2 * earth_r * enemyRandomR * Math::Cos(Math::Pi - enemyRandomDeg));
-	to = { l,houseDeg + asin((enemyRandomR * sin(Math::Pi - enemyRandomDeg)) / l) * 180 /Math::Pi };
+	init(Vec2{ enemyData.r,enemyData.deg });
+}
+
+Enemy::Enemy(const Vec2& spawn, double earth_r, double enemyHouseRange)
+	:earth_r(earth_r)
+	,enemyHouseRange(enemyHouseRange)
+{
+	init(spawn);
 }
 
 Enemy::~Enemy()
 {
+}
+
+void Enemy::init(Vec2 spawn)
+{
+	currentHP = maxHP;
+	eShotCoolTime = Random(2.7, 3.0);
+	r_deg = spawn + Vec2{ earth_r + 300,0 };
+	from = r_deg;
+	int houseDeg = (static_cast<int>((r_deg.y + 45.0) / 90) % 4) * 90;
+	double enemyRandomDeg = Random(-60, 60) * Math::Pi / 180;
+	double enemyRandomR = enemyHouseRange + Random(0, 120);
+	double l = sqrt((earth_r * earth_r) + (enemyRandomR * enemyRandomR) - 2 * earth_r * enemyRandomR * Math::Cos(Math::Pi - enemyRandomDeg));
+	to = { l,houseDeg + asin((enemyRandomR * sin(Math::Pi - enemyRandomDeg)) / l) * 180 / Math::Pi };
+	if (from.y - to.y > 180.0)
+		to.y += 360.0;
 }
 
 void Enemy::draw() const
@@ -29,7 +43,8 @@ void Enemy::draw() const
 bool Enemy::calcHP(double damage)
 {
 	currentHP -= damage;
-	return currentHP <= 0;
+	deathFlag = currentHP <= 0;
+	return deathFlag;
 }
 
 void Enemy::Shot(Array<Bullet>& eBulletArr, const Vec2& pJetPos)
@@ -38,9 +53,9 @@ void Enemy::Shot(Array<Bullet>& eBulletArr, const Vec2& pJetPos)
 	Vec2 directPJet = pJetPos - getCollider().center;
 	Vec2 directTown = OffsetCircular({ 0,0 }, earth_r, ((static_cast<int>((r_deg.y + 45.0) / 90) % 4) * 90)*Math::Pi/180) - getCollider().center;
 	if(directPJet.x * directPJet.x + directPJet.y * directPJet.y > directTown.x * directTown.x + directTown.y * directTown.y)
-		eBulletArr << Bullet{ Circle{0,0,eBullet_r},Vec2{getCollider().center},directTown };
+		eBulletArr << Bullet{ Circle{Arg::center(Vec2{getCollider().center}),eBullet_r},directTown};
 	else
-		eBulletArr << Bullet{ Circle{0,0,eBullet_r},Vec2{getCollider().center},directPJet };
+		eBulletArr << Bullet{ Circle{Arg::center(Vec2{getCollider().center}),eBullet_r},directPJet};
 }
 
 void Enemy::move()
@@ -59,10 +74,17 @@ ReadEnemyData Enemy::getData()
 {
 	return enemyData;
 }
+
+bool Enemy::getDeathFlag()
+{
+	return deathFlag;
+}
+
 double Enemy::geteShotCoolTime()
 {
 	return eShotCoolTime;
 }
+
 Vec2 Enemy::getFrom()
 {
 	return from;

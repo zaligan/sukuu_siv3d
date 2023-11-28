@@ -15,7 +15,6 @@ struct ReadEnemyData
 struct Bullet
 {
 	Circle collider;
-	Vec2 position;
 	Vec2 direction;
 };
 
@@ -25,18 +24,21 @@ class Enemy
 {
 public:
 	Enemy(const ReadEnemyData& enemyData,double earth_r,double enemyHouseRange);
+	Enemy(const Vec2& spawn,double earth_r,double enemyHouseRange);
 	~Enemy();
+	void init(Vec2 spawn);
 	void draw() const;
 	void move();
 	bool calcHP(double damage);
 	void Shot(Array <Bullet> &eBulletArr,const Vec2& pJetPos);
+	bool getDeathFlag();
 	double geteShotCoolTime();
 	Vec2 getFrom();
 	Vec2 getTo();
 	Vec2 getPos();
 	Circle getCollider();
-	Vec2 r_deg{ 100,100 };
 	ReadEnemyData getData();
+	Vec2 r_deg{ 100,100 };
 	double eShotTimer = 0.0;
 	double currentHP;
 	Anime explosion_Anime{ AudioAsset(U"eDeathAud"),TextureAsset(U"eExplosionTex"), 8, 2, 0.03,0.35};
@@ -51,4 +53,5 @@ private:
 	double eShotCoolTime;
 	double earth_r;
 	double enemyHouseRange;
+	bool deathFlag = false;
 };
