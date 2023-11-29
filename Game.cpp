@@ -113,7 +113,7 @@ void Game::update()
 
 	//----シールド処理------
 	//アップグレード強化
-	double  maxShieldHealth = baseShieldHealth + pUpgrade.at(2) * shieldHealthRate;
+	maxShieldHealth = baseShieldHealth + pUpgrade.at(2) * shieldUpgRate;
 	//自然回復
 	shieldHealth = std::min(maxShieldHealth, shieldHealth + shieldRegenerationRate * deltaTime);
 	//e弾処理
@@ -286,13 +286,17 @@ void Game::draw() const
 		house.scaled(0.8).rotated(Math::Pi).drawAt(0, earth_r);
 		house.scaled(0.8).rotated(-Math::HalfPi).drawAt(-earth_r, 0);
 
+		shieldTex.scaled(0.6).drawAt(0, -earth_r);
+
 		//プレイヤー
+		pJetTex.scaled(playerSize).rotated(radians).drawAt(pJet_pos);
 		if (shieldFlag && shieldHealth > 0)
 		{
-			Circle{ pJet_collider.center,shieldSize * 30.0 }.draw(Palette::Pink);
-			shieldTex.scaled(1.8 * shieldSize).drawAt(pJet_pos);
+			double colorH = (maxShieldHealth - shieldHealth) / maxShieldHealth * 110;
+			Circle{ pJet_collider.center,shieldSize * 30.0 }.draw(ColorF(HSV{ 250 + colorH,0.9,1 },0.7));
+			shieldTex.scaled(0.18 * shieldSize).rotated(radians).drawAt(pJet_pos);
 		}
-		pJetTex.scaled(playerSize).rotated(radians).drawAt(pJet_pos);
+		
 		
 		//p弾
 		for (auto& bullet : pBullet_coliArr)
@@ -347,7 +351,7 @@ void Game::draw() const
 	for (int i = 0; i < townArr.size(); i++)
 	{
 		RoundRect{ 10,(i*interval) + 15,180,60,10}.draw(ColorF{1.0,0.4});
-		FontAsset(U"townHPTex")(townNameArr.at(i)).drawAt(100, (i*interval)+60);
+		FontAsset(U"townHPFont")(townNameArr.at(i)).drawAt(100, (i*interval)+60);
 	}
 	for (size_t i = 0; i < townArr.size(); i++)
 	{
@@ -362,7 +366,7 @@ void Game::draw() const
 	{
 		Rect{810+ 100 * i,1020,100,60}.draw(Palette::Darkgray);
 		Rect{ 810 + 100 * i,1020,100,60 }.drawFrame(5,Palette::Black);
-		FontAsset(U"townHPTex")(pUpgrade.at(i)).drawAt(860 + 100 * i, 1050,Palette::Blue);
+		FontAsset(U"townHPFont")(pUpgrade.at(i)).drawAt(860 + 100 * i, 1050,Palette::Blue);
 	}
 	TextureAsset(U"Attack_Item").scaled(0.05).drawAt(830, 1050);
 	TextureAsset(U"Protect_Item").scaled(0.05).drawAt(930, 1050);
@@ -379,6 +383,6 @@ void Game::draw() const
 	if (getData().testMode)
 	{
 		RoundRect{ 1770,0,150,80,10 }.draw(ColorF{ Palette::Magenta ,0.4});
-		FontAsset(U"townHPTex")(U"test").drawAt(1845, 40);
+		FontAsset(U"townHPFont")(U"test").drawAt(1845, 40);
 	}
 }

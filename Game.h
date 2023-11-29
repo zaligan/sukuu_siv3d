@@ -75,13 +75,14 @@ private:
 	//アップグレード
 	Array <int> pUpgrade = { 0,0,0 };
 	double shotSpeedRate = 0.94;//攻撃強化1ごとにかかる倍率
-	double shieldHealthRate = 15;//防御強化1ごとに加算する耐久値
+	double shieldUpgRate = 15;//防御強化1ごとに加算する耐久値
 	//シールド
 	double shieldSize = 1.0;
 	bool shieldFlag = false;
-	double baseShieldHealth = 20.0;
+	double baseShieldHealth = 200.0;
+	double  maxShieldHealth;
 	double shieldHealth = baseShieldHealth;
-	const double shieldRegenerationRate = 1.0;
+	const double shieldRegenerationRate = 5.0;
 	
 	Array <Vec2> pBullet_posArr;
 	Array <Circle> pBullet_coliArr;

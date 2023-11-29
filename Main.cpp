@@ -33,7 +33,7 @@ void Main()
 	TextureAsset::Register(U"eExplosionTex", U"picture/explosion.png");
 	TextureAsset::Register(U"backPic", U"picture/背景/StarryBackPic.png");
 	TextureAsset::Register(U"pJetTex", U"picture/Enemy/GalagianArtwork/raw/player/ship1.png");
-	TextureAsset::Register(U"shieldTex", U"picture/Enemy/GalagianArtwork/raw/player/shield1.png");
+	TextureAsset::Register(U"shieldTex", U"picture/player/shieldPic.png");
 	TextureAsset::Register(U"pBullet_tex", U"picture/Enemy/GalagianArtwork/raw/projectiles/shotsmall.png");
 	TextureAsset::Register(U"eBullet_tex", U"picture/Enemy/GalagianArtwork/raw/projectiles/shotoval.png");
 	TextureAsset::Register(U"enemy1_tex", U"picture/Enemy/GalagianArtwork/raw/enemies/kamikaze.png");
@@ -41,17 +41,19 @@ void Main()
 	TextureAsset::Register(U"Protect_Item", U"picture/Item/book_01_blue.png");
 	TextureAsset::Register(U"Special_Item", U"picture/Item/book_01_green.png");
 	TextureAsset::Register(U"earthTile", U"picture/stage/maptile_jimen_sogen_02_center.png");
+	TextureAsset::Register(U"titlePic", U"picture/Title/AsteriaSalvare_TitlePic.png");
 
 	AudioAsset::Register(U"gameBGM", U"music/battleBGM.mp3");
 	AudioAsset::Register(U"pShotAud", U"music/se_pyun2.mp3");
 	AudioAsset::Register(U"eDeathAud", U"music/maou_se_8bit12.mp3");
 
-	FontAsset::Register(U"townHPTex", 18, U"font/DotGothic16/DotGothic16-Regular.ttf");
+	FontAsset::Register(U"townHPFont", 18, U"font/DotGothic16/DotGothic16-Regular.ttf");
+	FontAsset::Register(U"titleFont", 40, U"font/DotGothic16/DotGothic16-Regular.ttf");
 
 	manager.add<Title>(State::Title);
 	manager.add<Game>(State::Game);
 
-	manager.init(State::Game);
+	//manager.init(State::Game);
 
 	while (System::Update())
 	{
