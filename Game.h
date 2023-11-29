@@ -39,15 +39,17 @@ private:
 	struct Town
 	{
 		Circle collider;
-		int32 townHP;
+		HPBar hp;
 	};
-	Array <Town> townArr;
-	Circle town0{ Arg::center(0,-earth_r),houseSize};
-	Circle town1{ Arg::center(-earth_r,0),houseSize };
-	Circle town2{ Arg::center(0,earth_r),houseSize };
-	Circle town3{ Arg::center(earth_r,0),houseSize };
 	int32 townHP = 1000;
-
+	Array <Town> townArr =
+	{
+		Town{Circle{Arg::center(0,-earth_r),houseSize},HPBar{townHP}},
+		Town{Circle{Arg::center(-earth_r,0),houseSize},HPBar{townHP}},
+		Town{Circle{Arg::center(0,earth_r),houseSize},HPBar{townHP}},
+		Town{Circle{Arg::center(earth_r,0),houseSize},HPBar{townHP}},
+	};
+	
 	//プレイヤー
 	const double playerSize = 1.3;
 	Circle pJet_collider{ 0,0,playerSize * 10 };
@@ -115,10 +117,4 @@ private:
 	const double cameraScale = 2.0;
 	Camera2D camera{ Vec2{ 0, 0 }, cameraScale };
 	Mat3x2 mat = Mat3x2::Identity();
-
-	//HPBar
-	Array<HPBar> hpBars =
-	{
-		HPBar{ townHP },HPBar{ townHP },HPBar{ townHP },HPBar{ townHP }
-	};
 };

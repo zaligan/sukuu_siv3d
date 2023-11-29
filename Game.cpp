@@ -4,7 +4,6 @@
 Game::Game(const InitData& init)
 	: IScene{ init }
 {
-	townArr << Town{ town0,townHP } << Town{ town1,townHP } << Town{ town2,townHP } << Town{ town3,townHP };
 	pJet_HP = pJet_MaxHP;
 	if (not enemyCSV) // もし読み込みに失敗したら
 	{
@@ -211,13 +210,12 @@ void Game::update()
 	for (auto it = eBulletArr.begin(); it != eBulletArr.end();)
 	{
 		bool exsit = false;
-		for (auto i : step(4))
+		for (auto i : step(townArr.size()))
 		{
 			if (it->collider.intersects(townArr.at(i).collider))
 			{
 				if(!getData().testMode)
-					townArr.at(i).townHP -= eBullet_damage;
-				hpBars[i].damage(eBullet_damage);
+					townArr.at(i).hp.damage(eBullet_damage);
 				it = eBulletArr.erase(it);
 				exsit = true;
 				break;
@@ -247,15 +245,15 @@ void Game::update()
 	//Town処理
 	for (auto& town : townArr)
 	{
-		if (town.townHP <= 0)
+		if (town.hp.getHP() <= 0)
 		{
 			gameOverFlag = true;
 		}
 	}
 	//HPBar
-	for (size_t i = 0; i < hpBars.size(); ++i)
+	for (size_t i = 0; i < townArr.size(); ++i)
 	{
-		hpBars[i].update();
+		townArr.at(i).hp.update();
 	}
 
 	//カメラ計算
@@ -277,7 +275,7 @@ void Game::draw() const
 
 		backPic.scaled(1.0).drawAt(0, 0);
 		//ステージ
-		earth.draw(Palette::Brown);
+		earth.draw(Palette::Saddlebrown);
 		for (int i = 0; i < 100; i++)
 		{
 			double tileDeg = Math::Pi * 2 / 100 * i;
@@ -344,31 +342,43 @@ void Game::draw() const
 
 	//-------UI------------
 	//街のHP
-	if (KeyH.pressed())
+	double interval = 75;
+	Array<String> townNameArr = {U"普通の街 HP",U"攻撃の街 HP" ,U"防御の街 HP" ,U"特殊の街 HP" };
+	for (int i = 0; i < townArr.size(); i++)
 	{
-		FontAsset(U"townHPTex")(U"普通の街 HP").drawAt(100, 60);
-		FontAsset(U"townHPTex")(U"攻撃の街 HP").drawAt(300, 60);
-		FontAsset(U"townHPTex")(U"防御の街 HP").drawAt(500, 60);
-		FontAsset(U"townHPTex")(U"特殊の街 HP").drawAt(700, 60);
-
-		RoundRect{ 10,15,180,80,10 }.draw(ColorF{ 1.0,0.4 });
-		RoundRect{ 210,15,180,80,10 }.draw(ColorF{ 1.0,0.4 });
-		RoundRect{ 410,15,180,80,10 }.draw(ColorF{ 1.0,0.4 });
-		RoundRect{ 610,15,180,80,10 }.draw(ColorF{ 1.0,0.4 });
+		RoundRect{ 10,(i*interval) + 15,180,60,10}.draw(ColorF{1.0,0.4});
+		FontAsset(U"townHPTex")(townNameArr.at(i)).drawAt(100, (i*interval)+60);
+	}
+	for (size_t i = 0; i < townArr.size(); i++)
+	{
+		const double x = 0;
+		const double y = interval * i;
+		const RectF rect = RectF{ x, y, 150, 16 }.movedBy(25, 30);
+		townArr.at(i).hp.draw(rect);
 	}
 
-	//HPBar
-	for (size_t i = 0; i < hpBars.size(); i++)
+	//プレイヤー強化
+	for (auto i : step(pUpgrade.size()))
 	{
-		const double x = i * 200;
-		const double y = 30;
-		const RectF rect = RectF{ x, y, 150, 16 }.movedBy(25, 0);
-		hpBars[i].draw(rect);
+		Rect{810+ 100 * i,1020,100,60}.draw(Palette::Darkgray);
+		Rect{ 810 + 100 * i,1020,100,60 }.drawFrame(5,Palette::Black);
+		FontAsset(U"townHPTex")(pUpgrade.at(i)).drawAt(860 + 100 * i, 1050,Palette::Blue);
 	}
+	TextureAsset(U"Attack_Item").scaled(0.05).drawAt(830, 1050);
+	TextureAsset(U"Protect_Item").scaled(0.05).drawAt(930, 1050);
+	TextureAsset(U"Special_Item").scaled(0.05).drawAt(1030, 1050);
+
 	//GameOver
 	if (gameOverFlag)
 	{
 		font(U"GMAE OVER").drawAt(Scene::Center(), Palette::Gray);
 		font(U"Press J Key").drawAt(20, { Scene::Center().x,350 }, Palette::Gray);
+	}
+
+	//testモード
+	if (getData().testMode)
+	{
+		RoundRect{ 1770,0,150,80,10 }.draw(ColorF{ Palette::Magenta ,0.4});
+		FontAsset(U"townHPTex")(U"test").drawAt(1845, 40);
 	}
 }

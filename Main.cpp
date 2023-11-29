@@ -46,7 +46,7 @@ void Main()
 	AudioAsset::Register(U"pShotAud", U"music/se_pyun2.mp3");
 	AudioAsset::Register(U"eDeathAud", U"music/maou_se_8bit12.mp3");
 
-	FontAsset::Register(U"townHPTex", 20, U"font/DotGothic16/DotGothic16-Regular.ttf");
+	FontAsset::Register(U"townHPTex", 18, U"font/DotGothic16/DotGothic16-Regular.ttf");
 
 	manager.add<Title>(State::Title);
 	manager.add<Game>(State::Game);
