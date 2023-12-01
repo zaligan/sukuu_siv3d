@@ -55,13 +55,16 @@ private:
 	Circle pJet_collider{ 0,0,playerSize * 10 };
 	const double horizSpeed = 0.5;
 	const double vertSpeed = 200.0;
+	const double maxRotatSpeed = 4.0;//半径bottomの時１周にかかる秒数
+	const double minRotatSpeed = 12.0;//半径topの時１周にかかる秒数
 	//半径方向のプレイヤーが動ける範囲
 	struct MoveRange
 	{
 		double bottom;
 		double top;
 	};
-	const MoveRange moveRange{ earth_r + 60,earth_r + 200 };
+	//const MoveRange moveRange{ earth_r + 60,earth_r + 200 };
+	const MoveRange moveRange{ 0,earth_r + 200 };
 	double pJet_r = moveRange.bottom;
 	double radians = 0.0;
 	Vec2 pJet_pos{ 0,0 };

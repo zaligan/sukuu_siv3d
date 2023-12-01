@@ -47,10 +47,14 @@ void Game::update()
 	//-------プレイヤー-------
 	//p操作受付
 	shieldFlag = KeyK.pressed();
-	if (KeyA.pressed() || KeyLeft.pressed())
+	/*if (KeyA.pressed() || KeyLeft.pressed())
 		radians -= horizSpeed * deltaTime;
 	if (KeyD.pressed() || KeyRight.pressed())
-		radians += horizSpeed * deltaTime;
+		radians += horizSpeed * deltaTime;*/
+	if (KeyA.pressed() || KeyLeft.pressed())
+		radians -= 2 * Math::Pi * deltaTime / (maxRotatSpeed + ((minRotatSpeed - maxRotatSpeed) * ((pJet_r - moveRange.bottom) / (moveRange.top - moveRange.bottom))));
+	if (KeyD.pressed() || KeyRight.pressed())
+		radians += 2 * Math::Pi * deltaTime / (maxRotatSpeed + ((minRotatSpeed - maxRotatSpeed) * ((pJet_r - moveRange.bottom) / (moveRange.top - moveRange.bottom))));
 	if (KeyW.pressed() || KeyUp.pressed())
 		pJet_r += vertSpeed * deltaTime;
 	if (KeyS.pressed() || KeyDown.pressed())
@@ -257,8 +261,14 @@ void Game::update()
 	}
 
 	//カメラ計算
-	camera.setTargetCenter({ 0,-moveRange.bottom - 110 });
-	camera.setTargetScale(cameraScale);
+	//引数の座標はゲーム内ではなく、回転の処理をした後、スケールを変える前の画面上座標
+	camera.setTargetCenter({0,-pJet_r - 110 });
+	
+	if (pJet_r < earth_r)
+		camera.setTargetScale(cameraScale* (1 - 0.65 * ((earth_r - pJet_r)/earth_r)));
+	else
+		camera.setTargetScale(cameraScale);
+
 	mat = Mat3x2::Rotate(-radians, { 0,0 });
 	camera.update();
 }
