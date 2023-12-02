@@ -9,17 +9,17 @@ Anime::Anime(const Texture& texture, int majorSize, int rowSize, double frmTime)
 	m_index({ 0,0 }),
 	m_count(0) {}
 
-Anime::Anime(const Audio& audio, const Texture& texture, int majorSize, int rowSize, double frmTime) :
-	m_audio(audio),
+Anime::Anime(const Texture & texture, int majorSize, int rowSize, double frmTime, double resize) :
 	m_texture(texture),
 	m_majorSize(majorSize),
 	m_rowSize(rowSize),
 	m_frmTime(frmTime),
+	m_resize(resize),
 	m_index({ 0,0 }),
 	m_count(0){}
 
-Anime::Anime(const Audio & audio, const Texture & texture, int majorSize, int rowSize, double frmTime, double resize) :
-	m_audio(audio),
+Anime::Anime(const String& audioPath, const Texture& texture, int majorSize, int rowSize, double frmTime, double resize):
+	m_audio(Audio{audioPath}),
 	m_texture(texture),
 	m_majorSize(majorSize),
 	m_rowSize(rowSize),

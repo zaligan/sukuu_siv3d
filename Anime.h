@@ -4,8 +4,8 @@ class Anime
 {
 public:
 	Anime(const Texture& texture, int majorSize, int rowSize, double frmTime);
-	Anime(const Audio& audio,const Texture& texture, int majorSize, int rowSize, double frmTime);
-	Anime(const Audio& audio,const Texture& texture, int majorSize, int rowSize, double frmTime,double resize);
+	Anime(const Texture& texture, int majorSize, int rowSize, double frmTime,double resize);
+	Anime(const String& audioPath, const Texture& texture, int majorSize, int rowSize, double frmTime,double resize);
 	bool update();
 	void draw(const Vec2& pos) const;
 

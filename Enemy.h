@@ -41,7 +41,7 @@ public:
 	Vec2 r_deg{ 100,100 };
 	double eShotTimer = 0.0;
 	double currentHP;
-	Anime explosion_Anime{ AudioAsset(U"eDeathAud"),TextureAsset(U"eExplosionTex"), 8, 2, 0.03,0.35};
+	Anime explosion_Anime{ (U"music/maou_se_8bit12.mp3"),TextureAsset(U"eExplosionTex"), 8, 2, 0.03,0.35};
 
 private:
 	Circle collider{ {0,0},10 };
