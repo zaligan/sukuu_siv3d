@@ -25,8 +25,6 @@ public:
 
 	Enemy(const Vec2& spawn,double earth_r,double enemyHouseRange);
 
-	~Enemy();
-
 	void init(Vec2 spawn);
 
 	void draw() const;

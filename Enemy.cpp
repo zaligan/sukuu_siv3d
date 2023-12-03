@@ -14,10 +14,6 @@ Enemy::Enemy(const Vec2& spawn, double earth_r, double enemyHouseRange)
 	init(spawn);
 }
 
-Enemy::~Enemy()
-{
-}
-
 void Enemy::init(Vec2 spawn)
 {
 	currentHP = maxHP;
