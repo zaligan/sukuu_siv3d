@@ -7,21 +7,6 @@ Enemy::Enemy(double r, double degree, double earth_r, double enemyHouseRange)
 	init(r, degree);
 }
 
-void Enemy::init(double r, double degree)
-{
-	currentHP = maxHP;
-	eShotCoolTime = Random(2.7, 3.0);
-	r_deg = Vec2{ r, degree } + Vec2{ earth_r + 300, 0 };
-	from = r_deg;
-	int houseDeg = (static_cast<int>((r_deg.y + 45.0) / 90) % 4) * 90;
-	double enemyRandomDeg = Random(-60, 60) * Math::Pi / 180;
-	double enemyRandomR = enemyHouseRange + Random(0, 120);
-	double l = sqrt((earth_r * earth_r) + (enemyRandomR * enemyRandomR) - 2 * earth_r * enemyRandomR * Math::Cos(Math::Pi - enemyRandomDeg));
-	to = { l,houseDeg + asin((enemyRandomR * sin(Math::Pi - enemyRandomDeg)) / l) * 180 / Math::Pi };
-	if (from.y - to.y > 180.0)
-		to.y += 360.0;
-}
-
 void Enemy::draw() const
 {
 	//collider.draw(Palette::Black);
@@ -38,12 +23,12 @@ bool Enemy::calcHP(double damage)
 void Enemy::Shot(Array<Bullet>& eBulletArr, const Vec2& pJetPos)
 {
 	eShotTimer = fmod(eShotTimer, eShotCoolTime);
-	Vec2 directPJet = pJetPos - getCollider().center;
+	Vec2 directPJet = pJetPos - getCenter();
 	Vec2 directTown = OffsetCircular({ 0,0 }, earth_r, ((static_cast<int>((r_deg.y + 45.0) / 90) % 4) * 90)*Math::Pi/180) - getCollider().center;
 	if(directPJet.x * directPJet.x + directPJet.y * directPJet.y > directTown.x * directTown.x + directTown.y * directTown.y)
-		eBulletArr << Bullet{ Circle{Arg::center(Vec2{getCollider().center}),eBullet_r},directTown};
+		eBulletArr << Bullet{ Circle{Arg::center(getCenter()),eBullet_r},directTown};
 	else
-		eBulletArr << Bullet{ Circle{Arg::center(Vec2{getCollider().center}),eBullet_r},directPJet};
+		eBulletArr << Bullet{ Circle{Arg::center(getCenter()),eBullet_r},directPJet};
 }
 
 void Enemy::move()
@@ -81,4 +66,24 @@ Vec2 Enemy::getTo()
 Vec2 Enemy::getPos()
 {
 	return OffsetCircular({ 0,0 }, r_deg.x, r_deg.y * Math::Pi / 180);
+}
+
+void Enemy::init(double r, double degree)
+{
+	currentHP = maxHP;
+	eShotCoolTime = Random(2.7, 3.0);
+	r_deg = Vec2{ r, degree } + Vec2{ earth_r + 300, 0 };
+	from = r_deg;
+	int houseDeg = (static_cast<int>((r_deg.y + 45.0) / 90) % 4) * 90;
+	double enemyRandomDeg = Random(-60, 60) * Math::Pi / 180;
+	double enemyRandomR = enemyHouseRange + Random(0, 120);
+	double l = sqrt((earth_r * earth_r) + (enemyRandomR * enemyRandomR) - 2 * earth_r * enemyRandomR * Math::Cos(Math::Pi - enemyRandomDeg));
+	to = { l,houseDeg + asin((enemyRandomR * sin(Math::Pi - enemyRandomDeg)) / l) * 180 / Math::Pi };
+	if (from.y - to.y > 180.0)
+		to.y += 360.0;
+}
+
+Vec2 Enemy::getCenter() const
+{
+	return collider.center;
 }

@@ -55,4 +55,6 @@ private:
 	bool deathFlag = false;
 
 	void init(double r, double degree);
+
+	Vec2 getCenter() const;
 };
