@@ -23,12 +23,18 @@ bool Enemy::calcHP(double damage)
 void Enemy::Shot(Array<Bullet>& eBulletArr, const Vec2& pJetPos)
 {
 	eShotTimer = fmod(eShotTimer, eShotCoolTime);
-	Vec2 directPJet = pJetPos - getCenter();
-	Vec2 directTown = OffsetCircular({ 0,0 }, earth_r, ((static_cast<int>((r_deg.y + 45.0) / 90) % 4) * 90)*Math::Pi/180) - getCollider().center;
-	if(directPJet.x * directPJet.x + directPJet.y * directPJet.y > directTown.x * directTown.x + directTown.y * directTown.y)
-		eBulletArr << Bullet{ Circle{Arg::center(getCenter()),eBullet_r},directTown};
+
+	const Vec2 directPJet = pJetPos - getCenter();
+	const Vec2 directTown = OffsetCircular({ 0,0 }, earth_r, ((static_cast<int>((r_deg.y + 45.0) / 90) % 4) * 90)*Math::Pi/180) - getCollider().center;
+
+	if (directTown.lengthSq() < directPJet.lengthSq())
+	{
+		eBulletArr << Bullet{ Circle{Arg::center(getCenter()),eBullet_r},directTown };
+	}
 	else
-		eBulletArr << Bullet{ Circle{Arg::center(getCenter()),eBullet_r},directPJet};
+	{
+		eBulletArr << Bullet{ Circle{Arg::center(getCenter()),eBullet_r},directPJet };
+	}
 }
 
 void Enemy::move()
