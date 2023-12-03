@@ -60,12 +60,12 @@ private:
 	//半径方向のプレイヤーが動ける範囲
 	struct MoveRange
 	{
-		double bottom;
-		double top;
+		double minRadius;
+		double maxRadius;
 	};
 	//const MoveRange moveRange{ earth_r + 60,earth_r + 200 };
 	const MoveRange moveRange{ 100,earth_r + 200 };
-	double pJet_r = moveRange.bottom;
+	double pJet_r = moveRange.minRadius;
 	double radians = 0.0;
 	Vec2 pJet_pos{ 0,0 };
 	const double pJet_MaxHP = 1.0;

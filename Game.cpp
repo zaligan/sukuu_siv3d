@@ -48,14 +48,14 @@ void Game::update()
 	//p操作受付
 	shieldFlag = KeyK.pressed();
 	if (KeyA.pressed() || KeyLeft.pressed())
-		radians -= 2 * Math::Pi * deltaTime / (maxRotatSpeed + ((minRotatSpeed - maxRotatSpeed) * ((pJet_r - moveRange.bottom) / (moveRange.top - moveRange.bottom))));
+		radians -= 2 * Math::Pi * deltaTime / (maxRotatSpeed + ((minRotatSpeed - maxRotatSpeed) * ((pJet_r - moveRange.minRadius) / (moveRange.maxRadius - moveRange.minRadius))));
 	if (KeyD.pressed() || KeyRight.pressed())
-		radians += 2 * Math::Pi * deltaTime / (maxRotatSpeed + ((minRotatSpeed - maxRotatSpeed) * ((pJet_r - moveRange.bottom) / (moveRange.top - moveRange.bottom))));
+		radians += 2 * Math::Pi * deltaTime / (maxRotatSpeed + ((minRotatSpeed - maxRotatSpeed) * ((pJet_r - moveRange.minRadius) / (moveRange.maxRadius - moveRange.minRadius))));
 	if (KeyW.pressed() || KeyUp.pressed())
 		pJet_r += vertSpeed * deltaTime;
 	if (KeyS.pressed() || KeyDown.pressed())
 		pJet_r -= vertSpeed * deltaTime;
-	pJet_r = Clamp(pJet_r, moveRange.bottom, moveRange.top);
+	pJet_r = Clamp(pJet_r, moveRange.minRadius, moveRange.maxRadius);
 
 	pJet_pos = OffsetCircular({ 0,0 }, pJet_r, radians);
 	pJet_collider.setCenter(pJet_pos);
