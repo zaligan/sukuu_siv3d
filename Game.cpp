@@ -161,8 +161,9 @@ void Game::update()
 		spawnNum += spawnRate;
 		while (1.0 <= spawnNum)
 		{
-			Vec2 temp{ Random(10,30),Random(0,360) };
-			enemy_arr << Enemy{ temp ,getData().earth_r,getData().enemyHouseRange };
+			const double r = Random(10, 30);
+			const double degree = Random(0, 360);
+			enemy_arr << Enemy{ r, degree ,getData().earth_r,getData().enemyHouseRange };
 			spawnNum--;
 		}
 	}

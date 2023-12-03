@@ -23,7 +23,7 @@ public:
 
 	Enemy(const ReadEnemyData& enemyData,double earth_r,double enemyHouseRange);
 
-	Enemy(const Vec2& spawn,double earth_r,double enemyHouseRange);
+	Enemy(double r, double degree, double earth_r,double enemyHouseRange);
 
 	void draw() const;
 	void move();
@@ -35,6 +35,8 @@ public:
 	Vec2 getTo();
 	Vec2 getPos();
 	Circle getCollider();
+
+	// TODO: deg のほうをラジアンにして、将来的には Vec2 → Circular に変更する
 	Vec2 r_deg{ 100,100 };
 	double eShotTimer = 0.0;
 	double currentHP;
@@ -52,5 +54,5 @@ private:
 	double enemyHouseRange;
 	bool deathFlag = false;
 
-	void init(Vec2 spawn);
+	void init(double r, double degree);
 };

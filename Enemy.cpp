@@ -4,21 +4,21 @@ Enemy::Enemy(const ReadEnemyData& enemyData, double earth_r, double enemyHouseRa
 	: earth_r(earth_r)
 	,enemyHouseRange(enemyHouseRange)
 {
-	init(Vec2{ enemyData.r,enemyData.deg });
+	init(enemyData.r, enemyData.deg);
 }
 
-Enemy::Enemy(const Vec2& spawn, double earth_r, double enemyHouseRange)
+Enemy::Enemy(double r, double degree, double earth_r, double enemyHouseRange)
 	:earth_r(earth_r)
 	,enemyHouseRange(enemyHouseRange)
 {
-	init(spawn);
+	init(r, degree);
 }
 
-void Enemy::init(Vec2 spawn)
+void Enemy::init(double r, double degree)
 {
 	currentHP = maxHP;
 	eShotCoolTime = Random(2.7, 3.0);
-	r_deg = spawn + Vec2{ earth_r + 300,0 };
+	r_deg = Vec2{ r, degree } + Vec2{ earth_r + 300, 0 };
 	from = r_deg;
 	int houseDeg = (static_cast<int>((r_deg.y + 45.0) / 90) % 4) * 90;
 	double enemyRandomDeg = Random(-60, 60) * Math::Pi / 180;
