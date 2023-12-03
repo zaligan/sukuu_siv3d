@@ -1,8 +1,7 @@
 ﻿#include "Enemy.h"
 
 Enemy::Enemy(const ReadEnemyData& enemyData, double earth_r, double enemyHouseRange)
-	:enemyData(enemyData)
-	,earth_r(earth_r)
+	: earth_r(earth_r)
 	,enemyHouseRange(enemyHouseRange)
 {
 	init(Vec2{ enemyData.r,enemyData.deg });
@@ -68,11 +67,6 @@ void Enemy::move()
 Circle Enemy::getCollider()
 {
 	return collider;
-}
-
-ReadEnemyData Enemy::getData()
-{
-	return enemyData;
 }
 
 bool Enemy::getDeathFlag()

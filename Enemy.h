@@ -20,10 +20,15 @@ const double eBullet_r = 4.0;
 class Enemy
 {
 public:
+
 	Enemy(const ReadEnemyData& enemyData,double earth_r,double enemyHouseRange);
+
 	Enemy(const Vec2& spawn,double earth_r,double enemyHouseRange);
+
 	~Enemy();
+
 	void init(Vec2 spawn);
+
 	void draw() const;
 	void move();
 	bool calcHP(double damage);
@@ -34,19 +39,18 @@ public:
 	Vec2 getTo();
 	Vec2 getPos();
 	Circle getCollider();
-	ReadEnemyData getData();
 	Vec2 r_deg{ 100,100 };
 	double eShotTimer = 0.0;
 	double currentHP;
 	Anime explosion_Anime{ (U"music/maou_se_8bit12.mp3"),TextureAsset(U"eExplosionTex"), 8, 2, 0.03,0.35};
 
 private:
+
 	Circle collider{ {0,0},10 };
 	Vec2 from;
 	Vec2 to;
 	double maxHP = 20.0;
 	Stopwatch stopwatch{ StartImmediately::Yes };
-	ReadEnemyData enemyData;
 	double eShotCoolTime;
 	double earth_r;
 	double enemyHouseRange;
