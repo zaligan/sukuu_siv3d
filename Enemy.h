@@ -1,6 +1,7 @@
 ﻿#pragma once
 #include <Siv3D.hpp>
 #include"Anime.h"
+#include "Bullet.h"
 
 struct ReadEnemyData
 {
@@ -12,11 +13,7 @@ struct ReadEnemyData
 	double r;
 	double deg;
 };
-struct Bullet
-{
-	Circle collider;
-	Vec2 direction;
-};
+
 
 const double eBullet_r = 4.0;
 
@@ -30,7 +27,7 @@ public:
 	void draw() const;
 	void move();
 	bool calcHP(double damage);
-	void Shot(Array <Bullet> &eBulletArr,const Vec2& pJetPos);
+	void Shot(Array<Bullet> &eBulletArr,const Vec2& pJetPos);
 	bool getDeathFlag();
 	double geteShotCoolTime();
 	Vec2 getFrom();
