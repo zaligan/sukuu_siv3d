@@ -173,7 +173,11 @@ void Game::update()
 	{
 		if (readEnemyDataArr.at(addLine).spawnTime < sceneTime)
 		{
-			enemy_arr << Enemy{ readEnemyDataArr.at(addLine),getData().earth_r,getData().enemyHouseRange };
+			const ReadEnemyData& enemyData = readEnemyDataArr.at(addLine);
+			const double r = enemyData.r;
+			const double degree = enemyData.deg;
+
+			enemy_arr << Enemy{ r, degree, getData().earth_r, getData().enemyHouseRange };
 			addLine++;
 		}
 		else

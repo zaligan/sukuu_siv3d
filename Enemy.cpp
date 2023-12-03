@@ -1,12 +1,5 @@
 ﻿#include "Enemy.h"
 
-Enemy::Enemy(const ReadEnemyData& enemyData, double earth_r, double enemyHouseRange)
-	: earth_r(earth_r)
-	,enemyHouseRange(enemyHouseRange)
-{
-	init(enemyData.r, enemyData.deg);
-}
-
 Enemy::Enemy(double r, double degree, double earth_r, double enemyHouseRange)
 	:earth_r(earth_r)
 	,enemyHouseRange(enemyHouseRange)

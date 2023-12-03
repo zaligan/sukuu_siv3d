@@ -21,7 +21,7 @@ class Enemy
 {
 public:
 
-	Enemy(const ReadEnemyData& enemyData,double earth_r,double enemyHouseRange);
+	Enemy() = default;
 
 	Enemy(double r, double degree, double earth_r,double enemyHouseRange);
 
