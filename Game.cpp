@@ -208,6 +208,7 @@ void Game::update()
 	//移動処理
 	for (auto& bullet : eBulletArr)
 	{
+		// TODO: bullet.direction を単位ベクトルにしたので、eBullet_speed の値は再検討が必要
 		Vec2 move(bullet.direction * eBullet_speed * deltaTime);
 		bullet.collider.setCenter(bullet.collider.center + move);
 	}
