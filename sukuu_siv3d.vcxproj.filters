@@ -378,6 +378,9 @@
     <Text Include="App\example\LICENSE.txt">
       <Filter>Resource Files\example</Filter>
     </Text>
+    <Text Include="App\asset-list.txt">
+      <Filter>Resource Files</Filter>
+    </Text>
   </ItemGroup>
   <ItemGroup>
     <None Include="App\dll\soundtouch\SoundTouch_x64.dll">
@@ -927,6 +930,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Anime.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Bullet.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

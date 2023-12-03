@@ -10,53 +10,79 @@ void Main()
 	Window::SetTitle(U"AsteriaSalvare");
 	Scene::SetResizeMode(ResizeMode::Keep);
 	Scene::Resize(1920, 1080);
-	Window::Resize(Size{ 1280, 720 });
+	Window::Resize(Size{ 640, 360 });
 
 #if not _DEBUG
 	Window::SetFullscreen(true);
 #endif
 	System::Update();
 
+	//シーンマネージャーを作成
 	App manager;
-	const TOMLReader toml{ U"config.toml" };
-	if (not toml)
-	{
-		throw Error{ U"Failed to load 'config.toml'" };
-	}
-	manager.get()->earth_r = toml[U"WorldSetting.earth_r"].get<double>();
-	manager.get()->houseSize = toml[U"WorldSetting.houseSize"].get<double>();
-	manager.get()->enemyHouseRange = toml[U"WorldSetting.enemyHouseRange"].get<double>();
+
+	//調整用無敵モード、通常プレイ時はコメントアウト
 	manager.get()->testMode = true;
+
 	//Asset登録
-	String readSTR = toml[U"Enemy.tex"].get<String>();//自動で読み取ろうとした残骸
-	TextureAsset::Register(U"enemyTex", readSTR);
-	TextureAsset::Register(U"eExplosionTex", U"picture/explosion.png");
-	TextureAsset::Register(U"backPic", U"picture/背景/StarryBackPic.png");
-	TextureAsset::Register(U"pJetTex", U"picture/Enemy/GalagianArtwork/raw/player/ship1.png");
-	TextureAsset::Register(U"shieldTex", U"picture/player/shieldPic.png");
-	TextureAsset::Register(U"pBullet_tex", U"picture/Enemy/GalagianArtwork/raw/projectiles/shotsmall.png");
-	TextureAsset::Register(U"eBullet_tex", U"picture/Enemy/GalagianArtwork/raw/projectiles/shotoval.png");
-	TextureAsset::Register(U"enemy1_tex", U"picture/Enemy/GalagianArtwork/raw/enemies/kamikaze.png");
-	TextureAsset::Register(U"Attack_Item", U"picture/Item/book_01_red.png");
-	TextureAsset::Register(U"Protect_Item", U"picture/Item/book_01_blue.png");
-	TextureAsset::Register(U"Special_Item", U"picture/Item/book_01_green.png");
-	TextureAsset::Register(U"earthTile", U"picture/stage/maptile_jimen_sogen_02_center.png");
-	TextureAsset::Register(U"titlePic", U"picture/Title/AsteriaSalvare_TitlePic.png");
+	TextReader reader{ U"asset-list.txt" };
+	if (not reader)
+	{
+		throw Error{ U"Failed to load 'asset-list.txt'" };
+	}
 
-	AudioAsset::Register(U"gameBGM", U"music/battleBGM.mp3");
-	AudioAsset::Register(U"pShotAud", U"music/se_pyun2.mp3");
-	AudioAsset::Register(U"eDeathAud", U"music/maou_se_8bit12.mp3");
+	String line;
+	//１行ずつ読み込む
+	while (reader.readLine(line))
+	{
+		//tab区切りでitemsに格納
+		const Array<String> items = line.split(U'\t');
+		//Fontの時は長さ４、その他は長さ３かどうかチェック
+		if ((items[0] == U"Font" && items.size() != 4) || (items[0] != U"Font" && items.size() != 3))
+		{
+			throw Error{ U"Invalid asset-list.txt" };
+		}
+		//アセットの型
+		const String& type = items[0];
+		//アセットに付ける名前
+		const String& assetName = items[1];
+		//アセットとして登録するファイルのパス
+		const String& path = items[2];
 
-	FontAsset::Register(U"townHPFont", 18, U"font/DotGothic16/DotGothic16-Regular.ttf");
-	FontAsset::Register(U"titleFont", 40, U"font/DotGothic16/DotGothic16-Regular.ttf");
+		//Textureアセットの登録
+		if (type == U"Texture")
+		{
+			TextureAsset::Register(assetName, path);
+			continue;
+		}
 
+		//Audioアセットの登録
+		if (type == U"Audio")
+		{
+			AudioAsset::Register(assetName, path);
+			continue;
+		}
+
+		//Fontアセットの登録
+		if (type == U"Font")
+		{
+			//items[3]はフォントの大きさ
+			const int32 fontSize = Parse<int32>(items[3]);
+			FontAsset::Register(assetName, fontSize , path);
+			continue;
+		}
+	}
+	//シーンの追加
 	manager.add<Title>(State::Title);
 	manager.add<Game>(State::Game);
 
+	//Gameシーンから開始する場合このコメントを外す
 	manager.init(State::Game);
 
+	//メインループ
 	while (System::Update())
 	{
+		//現在のシーンを実行
+		//シーンに実装された.update()次に.draw()の順で実行される
 		if (not manager.update())
 		{
 			break;

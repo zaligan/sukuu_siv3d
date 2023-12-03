@@ -8,13 +8,10 @@ enum class State
 	Game
 };
 
-// 共有するデータ
+// シーン間で共有するデータ
 struct GameData
 {
-	double earth_r;
-	double houseSize;
-	double enemyHouseRange;
-	bool testMode;
+	bool testMode = false;
 };
 
 using App = SceneManager<State, GameData>;

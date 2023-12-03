@@ -9,18 +9,6 @@ Game::Game(const InitData& init)
 	{
 		throw Error{ U"Failed to load `EnemyDataSheat.csv`" };
 	}
-	for (size_t i = 1; i < enemyCount; i++)
-	{
-		ReadEnemyData readLine;
-		readLine.enemyType = Parse<int>(enemyCSV[i][0]);
-		readLine.movePattern = Parse<int>(enemyCSV[i][1]);
-		readLine.shotPattern = Parse<int>(enemyCSV[i][2]);
-		readLine.spawnTime = Parse<int>(enemyCSV[i][3]);
-		readLine.returnTime = Parse<int>(enemyCSV[i][4]);
-		readLine.r = Parse<double>(enemyCSV[i][5]);
-		readLine.deg = Parse<double>(enemyCSV[i][6]);
-		readEnemyDataArr << readLine;
-	}
 }
 
 void Game::update()
@@ -43,19 +31,19 @@ void Game::update()
 			changeScene(State::Title);
 		return;
 	}
-	
+
 	//-------プレイヤー-------
 	//p操作受付
 	shieldFlag = KeyK.pressed();
 	if (KeyA.pressed() || KeyLeft.pressed())
-		radians -= 2 * Math::Pi * deltaTime / (maxRotatSpeed + ((minRotatSpeed - maxRotatSpeed) * ((pJet_r - moveRange.bottom) / (moveRange.top - moveRange.bottom))));
+		radians -= 2 * Math::Pi * deltaTime / (maxRotatSpeed + ((minRotatSpeed - maxRotatSpeed) * ((pJet_r - moveRange.minRadius) / (moveRange.maxRadius - moveRange.minRadius))));
 	if (KeyD.pressed() || KeyRight.pressed())
-		radians += 2 * Math::Pi * deltaTime / (maxRotatSpeed + ((minRotatSpeed - maxRotatSpeed) * ((pJet_r - moveRange.bottom) / (moveRange.top - moveRange.bottom))));
+		radians += 2 * Math::Pi * deltaTime / (maxRotatSpeed + ((minRotatSpeed - maxRotatSpeed) * ((pJet_r - moveRange.minRadius) / (moveRange.maxRadius - moveRange.minRadius))));
 	if (KeyW.pressed() || KeyUp.pressed())
 		pJet_r += vertSpeed * deltaTime;
 	if (KeyS.pressed() || KeyDown.pressed())
 		pJet_r -= vertSpeed * deltaTime;
-	pJet_r = Clamp(pJet_r, moveRange.bottom, moveRange.top);
+	pJet_r = Clamp(pJet_r, moveRange.minRadius, moveRange.maxRadius);
 
 	pJet_pos = OffsetCircular({ 0,0 }, pJet_r, radians);
 	pJet_collider.setCenter(pJet_pos);
@@ -90,7 +78,7 @@ void Game::update()
 		//p弾Hit処理
 		for (auto it = enemy_arr.begin(); it != enemy_arr.end();)
 		{
-			if (!it->getDeathFlag() && (pBullet_coliArr.at(i).intersects(it->getCollider())))
+			if (!it->checkDeath() && (pBullet_coliArr.at(i).intersects(it->getCollider())))
 			{
 				pBullet_coliArr.erase(pBullet_coliArr.begin() + i);
 				pBullet_posArr.erase(pBullet_posArr.begin() + i);
@@ -140,7 +128,7 @@ void Game::update()
 	{
 		if (it->r_deg.x > earth_r)
 			it->r_deg.x -= itemSpeed * deltaTime;
-		Vec2 rectPos = OffsetCircular({ 0,0 }, it->r_deg.x, it->r_deg.y * Math::Pi / 180);
+		Vec2 rectPos = OffsetCircular({ 0,0 }, it->r_deg.x, it->r_deg.y);
 		Rect collider{ Arg::center(lround(rectPos.x),lround(rectPos.y)) ,20,20 };
 		if (collider.intersects(pJet_collider))
 		{
@@ -161,26 +149,31 @@ void Game::update()
 		spawnNum += spawnRate;
 		while (1.0 <= spawnNum)
 		{
-			enemy_arr << Enemy{ Vec2{ Random(10,30),Random(0,360) } ,getData().earth_r,getData().enemyHouseRange };
+			const double r = Random(10, 30);
+			const double degree = Math::ToRadians(Random(0, 360));
+			enemy_arr << Enemy{ r, degree ,earth_r,enemyHouseRange };
 			spawnNum--;
 		}
 	}
 
-	//CSVスポーン
-	while (addLine + 1 <= readEnemyDataArr.size())
+	//CSVスポーン １行目は項目のためスルー
+	while (index + 2 <= enemyCSV.rows())
 	{
-		if (readEnemyDataArr.at(addLine).spawnTime < sceneTime)
+		if (Parse<int32>(enemyCSV[index + 1][0]) < sceneTime)
 		{
-			enemy_arr << Enemy{ readEnemyDataArr.at(addLine),getData().earth_r,getData().enemyHouseRange };
-			addLine++;
+			const double r = Parse<double>(enemyCSV[index + 1][1]);
+			const double degree = Math::ToRadians(Parse<double>(enemyCSV[index + 1][2]));
+			enemy_arr << Enemy{ r, degree, earth_r, enemyHouseRange };
+			index++;
 		}
 		else
 			break;
 	}
+
 	//e本体処理
 	for (auto it = enemy_arr.begin(); it != enemy_arr.end();)
 	{
-		if (it->getDeathFlag())
+		if (it->checkDeath())
 		{
 			if (it->explosion_Anime.update())
 			{
@@ -194,7 +187,7 @@ void Game::update()
 		it->eShotTimer += deltaTime;
 		if ((it->geteShotCoolTime() < it->eShotTimer))
 		{
-			it->Shot(eBulletArr, pJet_pos);
+			it->shot(eBulletArr, pJet_pos);
 		}
 		++it;
 	}
@@ -202,6 +195,7 @@ void Game::update()
 	//移動処理
 	for (auto& bullet : eBulletArr)
 	{
+		// TODO: bullet.direction を単位ベクトルにしたので、eBullet_speed の値は再検討が必要
 		Vec2 move(bullet.direction * eBullet_speed * deltaTime);
 		bullet.collider.setCenter(bullet.collider.center + move);
 	}
@@ -213,7 +207,7 @@ void Game::update()
 		{
 			if (it->collider.intersects(townArr.at(i).collider))
 			{
-				if(!getData().testMode)
+				if (!getData().testMode)
 					townArr.at(i).hp.damage(eBullet_damage);
 				it = eBulletArr.erase(it);
 				exsit = true;
@@ -257,10 +251,10 @@ void Game::update()
 
 	//カメラ計算
 	//引数の座標はゲーム内ではなく、回転の処理をした後、スケールを変える前の画面上座標
-	camera.setTargetCenter({0,-pJet_r - 90 });
-	
+	camera.setTargetCenter({ 0,-pJet_r - 90 });
+
 	if (pJet_r < earth_r)
-		camera.setTargetScale(cameraScale* (1 - 0.65 * ((earth_r - pJet_r)/earth_r)));
+		camera.setTargetScale(cameraScale * (1 - 0.65 * ((earth_r - pJet_r) / earth_r)));
 	else
 		camera.setTargetScale(cameraScale);
 
@@ -284,7 +278,7 @@ void Game::draw() const
 		for (int i = 0; i < 100; i++)
 		{
 			double tileDeg = Math::Pi * 2 / 100 * i;
-			TextureAsset(U"earthTile").scaled(0.07).rotated(tileDeg).drawAt(OffsetCircular({0,0}, earth_r, tileDeg));
+			TextureAsset(U"earthTile").scaled(0.07).rotated(tileDeg).drawAt(OffsetCircular({ 0,0 }, earth_r, tileDeg));
 		}
 		house.scaled(0.8).drawAt(0, -earth_r);
 		house.scaled(0.8).rotated(Math::HalfPi).drawAt(earth_r, 0);
@@ -298,11 +292,11 @@ void Game::draw() const
 		if (shieldFlag && shieldHealth > 0)
 		{
 			double colorH = (maxShieldHealth - shieldHealth) / maxShieldHealth * 110;
-			Circle{ pJet_collider.center,shieldSize * 30.0 }.draw(ColorF(HSV{ 250 + colorH,0.9,1 },0.7));
+			Circle{ pJet_collider.center,shieldSize * 30.0 }.draw(ColorF(HSV{ 250 + colorH,0.9,1 }, 0.7));
 			shieldTex.scaled(0.18 * shieldSize).rotated(radians).drawAt(pJet_pos);
 		}
-		
-		
+
+
 		//p弾
 		for (auto& bullet : pBullet_coliArr)
 		{
@@ -318,7 +312,7 @@ void Game::draw() const
 			}
 			else
 			{
-				enemy.explosion_Anime.draw(OffsetCircular({ 0,0 }, enemy.r_deg.x, enemy.r_deg.y * Math::Pi / 180));
+				enemy.explosion_Anime.draw(OffsetCircular({ 0,0 }, enemy.r_deg.x, enemy.r_deg.y));
 			}
 		}
 		//敵弾
@@ -345,18 +339,18 @@ void Game::draw() const
 			default:
 				break;
 			}
-			TextureAsset(texName).scaled(0.04).rotated(item.r_deg.y * Math::Pi / 180).drawAt(OffsetCircular({ 0,0 }, item.r_deg.x, item.r_deg.y * Math::Pi / 180));
+			TextureAsset(texName).scaled(0.04).rotated(item.r_deg.y).drawAt(OffsetCircular({ 0,0 }, item.r_deg.x, item.r_deg.y));
 		}
 	}
 
 	//-------UI------------
 	//街のHP
 	double interval = 75;
-	Array<String> townNameArr = {U"普通の街 HP",U"攻撃の街 HP" ,U"防御の街 HP" ,U"特殊の街 HP" };
+	Array<String> townNameArr = { U"普通の街 HP",U"攻撃の街 HP" ,U"防御の街 HP" ,U"特殊の街 HP" };
 	for (int i = 0; i < townArr.size(); i++)
 	{
-		RoundRect{ 10,(i*interval) + 15,180,60,10}.draw(ColorF{1.0,0.4});
-		FontAsset(U"townHPFont")(townNameArr.at(i)).drawAt(100, (i*interval)+60);
+		RoundRect{ 10,(i * interval) + 15,180,60,10 }.draw(ColorF{ 1.0,0.4 });
+		FontAsset(U"townHPFont")(townNameArr.at(i)).drawAt(100, (i * interval) + 60);
 	}
 	for (size_t i = 0; i < townArr.size(); i++)
 	{
@@ -369,9 +363,9 @@ void Game::draw() const
 	//プレイヤー強化
 	for (auto i : step(pUpgrade.size()))
 	{
-		Rect{810+ 100 * i,1020,100,60}.draw(Palette::Darkgray);
-		Rect{ 810 + 100 * i,1020,100,60 }.drawFrame(5,Palette::Black);
-		FontAsset(U"townHPFont")(pUpgrade.at(i)).drawAt(860 + 100 * i, 1050,Palette::Blue);
+		Rect{ 810 + 100 * i,1020,100,60 }.draw(Palette::Darkgray);
+		Rect{ 810 + 100 * i,1020,100,60 }.drawFrame(5, Palette::Black);
+		FontAsset(U"townHPFont")(pUpgrade.at(i)).drawAt(860 + 100 * i, 1050, Palette::Blue);
 	}
 	TextureAsset(U"Attack_Item").scaled(0.05).drawAt(830, 1050);
 	TextureAsset(U"Protect_Item").scaled(0.05).drawAt(930, 1050);
@@ -387,7 +381,7 @@ void Game::draw() const
 	//testモード
 	if (getData().testMode)
 	{
-		RoundRect{ 1770,0,150,80,10 }.draw(ColorF{ Palette::Magenta ,0.4});
+		RoundRect{ 1770,0,150,80,10 }.draw(ColorF{ Palette::Magenta ,0.4 });
 		FontAsset(U"townHPFont")(U"test").drawAt(1845, 40);
 	}
 }

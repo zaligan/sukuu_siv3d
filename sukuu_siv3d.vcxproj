@@ -179,6 +179,7 @@
     <ResourceCompile Include="App\Resource.rc" />
   </ItemGroup>
   <ItemGroup>
+    <Text Include="App\asset-list.txt" />
     <Text Include="App\dll\soundtouch\COPYING.TXT" />
     <Text Include="App\engine\font\fontawesome\LICENSE.txt" />
     <Text Include="App\engine\soundfont\GMGSx.sf2.txt" />
@@ -354,6 +355,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Anime.h" />
+    <ClInclude Include="Bullet.hpp" />
     <ClInclude Include="Common.h" />
     <ClInclude Include="Enemy.h" />
     <ClInclude Include="Game.h" />
