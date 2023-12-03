@@ -119,6 +119,6 @@ private:
 
 	// 2D カメラ
 	const double cameraScale = 2.0;
-	Camera2D camera{ Vec2{ 0, 0 }, cameraScale };
+	Camera2D camera{ Vec2{ 0, 0 }, cameraScale ,CameraControl::None_};
 	Mat3x2 mat = Mat3x2::Identity();
 };
