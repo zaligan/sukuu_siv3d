@@ -25,8 +25,6 @@ public:
 
 	Enemy(const Vec2& spawn,double earth_r,double enemyHouseRange);
 
-	void init(Vec2 spawn);
-
 	void draw() const;
 	void move();
 	bool calcHP(double damage);
@@ -53,4 +51,6 @@ private:
 	double earth_r;
 	double enemyHouseRange;
 	bool deathFlag = false;
+
+	void init(Vec2 spawn);
 };
