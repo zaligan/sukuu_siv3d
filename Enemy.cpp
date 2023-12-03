@@ -29,11 +29,27 @@ void Enemy::Shot(Array<Bullet>& eBulletArr, const Vec2& pJetPos)
 
 	if (directTown.lengthSq() < directPJet.lengthSq())
 	{
-		eBulletArr << Bullet{ Circle{Arg::center(getCenter()),eBullet_r},directTown };
+		Vec2 direction = directTown.normalized();
+
+		if (direction.isZero())
+		{
+			// TODO: ゼロベクトルの場合に飛ばす方向はあとで再検討
+			direction = Vec2{ 0,1 };
+		}
+
+		eBulletArr << Bullet{ Circle{Arg::center(getCenter()),eBullet_r}, direction };
 	}
 	else
 	{
-		eBulletArr << Bullet{ Circle{Arg::center(getCenter()),eBullet_r},directPJet };
+		Vec2 direction = directPJet.normalized();
+
+		if (direction.isZero())
+		{
+			// TODO: ゼロベクトルの場合に飛ばす方向はあとで再検討
+			direction = Vec2{ 0,1 };
+		}
+
+		eBulletArr << Bullet{ Circle{Arg::center(getCenter()),eBullet_r}, directPJet.normalized() };
 	}
 }
 
