@@ -87,7 +87,8 @@ private:
 	double  maxShieldHealth;
 	double shieldHealth = baseShieldHealth;
 	const double shieldRegenerationRate = 5.0;
-
+	Anime shieldAnime{ TextureAsset(U"shieldTex"), 4, 5, 0.04, 0.18 };
+	//Vec2 shieldAnimePosOffset{ 0,0 };
 	Array <Vec2> pBullet_posArr;
 	Array <Circle> pBullet_coliArr;
 

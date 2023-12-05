@@ -1,7 +1,7 @@
 Texture	pJetTex	picture/Enemy/GalagianArtwork/raw/player/ship1.png
 Texture	backPic	picture/StarryBackPic.png
 Texture	townPic	picture/shiro_02_gray_roof_red.png
-Texture	shieldTex	picture/player/shieldPic.png
+Texture	shieldTex	picture/player/pipo-btleffect206_480.png
 Texture	pBullet_tex	picture/Enemy/GalagianArtwork/raw/projectiles/shotsmall.png
 Texture	eBullet_tex	picture/Enemy/GalagianArtwork/raw/projectiles/shotoval.png
 Texture	enemy1_tex	picture/Enemy/GalagianArtwork/raw/enemies/kamikaze.png

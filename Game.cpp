@@ -23,28 +23,44 @@ void Game::update()
 	eSpawnTimer += deltaTime;
 
 	if (pJet_HP <= 0)
+	{
 		gameOverFlag = true;
+	}
 	//ゲームオーバー
 	if (gameOverFlag)
 	{
 		if (KeyJ.down())
+		{
 			changeScene(State::Title);
+		}
 		return;
 	}
 
 	//-------プレイヤー-------
 	//p操作受付
 	shieldFlag = KeyK.pressed();
+	if (KeyK.up())
+	{
+		shieldAnime.reset();
+	}
 	if (KeyA.pressed() || KeyLeft.pressed())
+	{
 		radians -= 2 * Math::Pi * deltaTime / (maxRotatSpeed + ((minRotatSpeed - maxRotatSpeed) * ((pJet_r - moveRange.minRadius) / (moveRange.maxRadius - moveRange.minRadius))));
+	}
 	if (KeyD.pressed() || KeyRight.pressed())
+	{
 		radians += 2 * Math::Pi * deltaTime / (maxRotatSpeed + ((minRotatSpeed - maxRotatSpeed) * ((pJet_r - moveRange.minRadius) / (moveRange.maxRadius - moveRange.minRadius))));
+	}
 	if (KeyW.pressed() || KeyUp.pressed())
+	{
 		pJet_r += vertSpeed * deltaTime;
+	}
 	if (KeyS.pressed() || KeyDown.pressed())
+	{
 		pJet_r -= vertSpeed * deltaTime;
+	}
+	//p移動
 	pJet_r = Clamp(pJet_r, moveRange.minRadius, moveRange.maxRadius);
-
 	pJet_pos = OffsetCircular({ 0,0 }, pJet_r, radians);
 	pJet_collider.setCenter(pJet_pos);
 
@@ -87,7 +103,9 @@ void Game::update()
 				{
 					int rondomNum = Random(0, 10);
 					if (rondomNum < 3)
+					{
 						itemArr << Item{ rondomNum,it->r_deg };
+					}
 				}
 				++it;
 				break;
@@ -108,6 +126,7 @@ void Game::update()
 	if (shieldFlag && shieldHealth > 0)
 	{
 		Circle shieldCollider{ pJet_collider.center,shieldSize * 30.0 };
+		shieldAnime.update();
 		for (auto it = eBulletArr.begin(); it != eBulletArr.end();)
 		{
 			if (it->collider.intersects(shieldCollider))
@@ -127,7 +146,9 @@ void Game::update()
 	for (auto it = itemArr.begin(); it != itemArr.end();)
 	{
 		if (it->r_deg.x > earth_r)
+		{
 			it->r_deg.x -= itemSpeed * deltaTime;
+		}
 		Vec2 rectPos = OffsetCircular({ 0,0 }, it->r_deg.x, it->r_deg.y);
 		Rect collider{ Arg::center(lround(rectPos.x),lround(rectPos.y)) ,20,20 };
 		if (collider.intersects(pJet_collider))
@@ -167,7 +188,9 @@ void Game::update()
 			index++;
 		}
 		else
+		{
 			break;
+		}
 	}
 
 	//e本体処理
@@ -215,21 +238,29 @@ void Game::update()
 			}
 		}
 		if (exsit)
+		{
 			continue;
+		}
 
 		if (it->collider.intersects(pJet_collider))
 		{
 			if (!getData().testMode)
+			{
 				pJet_HP -= eBullet_damage;
+			}
 			it = eBulletArr.erase(it);
 		}
 
 		else
 		{
 			if (it->collider.intersects(earth))
+			{
 				it = eBulletArr.erase(it);
+			}
 			else
+			{
 				++it;
+			}
 		}
 	}
 	//範囲外の弾は削除
@@ -254,9 +285,13 @@ void Game::update()
 	camera.setTargetCenter({ 0,-pJet_r - 90 });
 
 	if (pJet_r < earth_r)
+	{
 		camera.setTargetScale(cameraScale * (1 - 0.65 * ((earth_r - pJet_r) / earth_r)));
+	}
 	else
+	{
 		camera.setTargetScale(cameraScale);
+	}
 
 	mat = Mat3x2::Rotate(-radians, { 0,0 });
 	camera.update();
@@ -285,15 +320,13 @@ void Game::draw() const
 		house.scaled(0.8).rotated(Math::Pi).drawAt(0, earth_r);
 		house.scaled(0.8).rotated(-Math::HalfPi).drawAt(-earth_r, 0);
 
-		shieldTex.scaled(0.6).drawAt(0, -earth_r);
-
 		//プレイヤー
 		pJetTex.scaled(playerSize).rotated(radians).drawAt(pJet_pos);
 		if (shieldFlag && shieldHealth > 0)
 		{
 			double colorH = (maxShieldHealth - shieldHealth) / maxShieldHealth * 110;
 			Circle{ pJet_collider.center,shieldSize * 30.0 }.draw(ColorF(HSV{ 250 + colorH,0.9,1 }, 0.7));
-			shieldTex.scaled(0.18 * shieldSize).rotated(radians).drawAt(pJet_pos);
+			shieldAnime.drawAt(pJet_pos, radians);
 		}
 
 
@@ -312,7 +345,7 @@ void Game::draw() const
 			}
 			else
 			{
-				enemy.explosion_Anime.draw(OffsetCircular({ 0,0 }, enemy.r_deg.x, enemy.r_deg.y));
+				enemy.explosion_Anime.drawAt(OffsetCircular({ 0,0 }, enemy.r_deg.x, enemy.r_deg.y));
 			}
 		}
 		//敵弾
