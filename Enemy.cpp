@@ -13,6 +13,14 @@ void Enemy::draw() const
 	TextureAsset(U"enemyTex").rotated(pos.theta).drawAt(collider.center);
 }
 
+void Enemy::move()
+{
+	const double t = Min(stopwatch.sF() / 10, 1.0);
+	pos.r = Math::Lerp(from.r, to.r, t);
+	pos.theta = Math::LerpAngle(from.theta, to.theta, t);
+	collider.setPos(pos);
+}
+
 bool Enemy::calcHP(double damage)
 {
 	currentHP -= damage;
@@ -20,75 +28,75 @@ bool Enemy::calcHP(double damage)
 	return deathFlag;
 }
 
-void Enemy::shot(Array<Bullet>& eBulletArr, const Vec2& pJetPos)
+bool Enemy::shot(Array<Bullet>& eBulletArr, const Vec2& pJetPos)
 {
-	eShotTimer = fmod(eShotTimer, eShotCoolTime);
-
-	const Vec2 directPJet = pJetPos - getCenter();
-	const Vec2 directTown = OffsetCircular({ 0,0 }, earth_r, ((static_cast<int>((pos.theta + (Math::HalfPi/2)) / Math::HalfPi) % 4) * Math::HalfPi)) - getCollider().center;
-
-	if (directTown.lengthSq() < directPJet.lengthSq())
+	//eShotCoolTime経過するごとに発射
+	if (stopwatch.sF() > eShotCoolTime * shotCnt)
 	{
-		Vec2 direction = directTown.normalized();
+		shotCnt++;
 
-		if (direction.isZero())
+		const Vec2 directPJet = pJetPos - getCenter();
+		const Vec2 directTown = OffsetCircular({ 0,0 }, earth_r, ((static_cast<int>((pos.theta + (Math::HalfPi / 2)) / Math::HalfPi) % 4) * Math::HalfPi)) - getCollider().center;
+
+		//プレイヤーと街の近いほうを狙う
+		if (directTown.lengthSq() < directPJet.lengthSq())
 		{
-			// TODO: ゼロベクトルの場合に飛ばす方向はあとで再検討
-			direction = Vec2{ 0,1 };
+			Vec2 direction = directTown.normalized();
+
+			if (direction.isZero())
+			{
+				// TODO: ゼロベクトルの場合に飛ばす方向はあとで再検討
+				direction = Vec2{ 0,1 };
+			}
+
+			eBulletArr << Bullet{ Circle{Arg::center(getCenter()),eBullet_r}, direction };
+		}
+		else
+		{
+			Vec2 direction = directPJet.normalized();
+
+			if (direction.isZero())
+			{
+				// TODO: ゼロベクトルの場合に飛ばす方向はあとで再検討
+				direction = Vec2{ 0,1 };
+			}
+
+			eBulletArr << Bullet{ Circle{Arg::center(getCenter()),eBullet_r}, directPJet.normalized() };
 		}
 
-		eBulletArr << Bullet{ Circle{Arg::center(getCenter()),eBullet_r}, direction };
+		return true;
 	}
-	else
-	{
-		Vec2 direction = directPJet.normalized();
-
-		if (direction.isZero())
-		{
-			// TODO: ゼロベクトルの場合に飛ばす方向はあとで再検討
-			direction = Vec2{ 0,1 };
-		}
-
-		eBulletArr << Bullet{ Circle{Arg::center(getCenter()),eBullet_r}, directPJet.normalized() };
-	}
+	return false;
 }
 
-void Enemy::move()
-{
-	const double t = Min(stopwatch.sF() / 10, 1.0);
-	pos.r = Math::Lerp(from.r, to.r, t);
-	pos.theta = Math::LerpAngle(from.theta, to.theta, t);
-	collider.setPos(OffsetCircular({ 0,0 }, pos.r, pos.theta));
-}
-
-Circle Enemy::getCollider()
+Circle Enemy::getCollider() const
 {
 	return collider;
 }
 
-bool Enemy::checkDeath()
+Circular Enemy::getPos() const
 {
-	return deathFlag;
+	return pos;
 }
 
-double Enemy::geteShotCoolTime()
+bool Enemy::checkDeath() const
 {
-	return eShotCoolTime;
+	return deathFlag;
 }
 
 void Enemy::init(double r, double theta)
 {
 	currentHP = maxHP;
-	double spawn_r = earth_r + offset_r + r;
+	double spawn_r = earth_r + r;
 	pos = Circular{ spawn_r, theta };
 	from = pos;
 	//一番近い家のラジアン 0, π/2, π, 3π/2
 	double houseDeg = (static_cast<int>((pos.theta + (Math::HalfPi/2)) / Math::HalfPi) % 4) * Math::HalfPi;
-
-
 	double enemyRandomTheta = Math::ToRadians(Random(-60, 60)) + houseDeg;
 	double enemyRandomR = enemyHouseRange + Random(0, 120);
-	to = OffsetCircular({ Circular(earth_r,houseDeg) }, enemyRandomR, enemyRandomTheta);
+
+	//OffsetCircularからCircularに変換するためVec2を経由
+	to = Vec2(OffsetCircular({ Circular(earth_r,houseDeg) }, enemyRandomR, enemyRandomTheta));	
 }
 
 Vec2 Enemy::getCenter() const

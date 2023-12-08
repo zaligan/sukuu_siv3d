@@ -33,15 +33,15 @@ public:
 	/// @param majorSize textureが持つコマの列数です
 	/// @param frmTime １コマの描画時間です(秒)
 	/// @param resize テクスチャの表示倍率です
-	/// @param audioPath 効果音のファイルパスです
-	Anime(const Texture& texture, int32 rowSize, int32 majorSize, double frmTime, double resize, const String& audioPath) :
+	/// @param audioPath 再生時に鳴らす効果音です
+	Anime(const Texture& texture, int32 rowSize, int32 majorSize, double frmTime, double resize, const Audio& audio) :
 		m_texture(texture),
 		m_majorSize(majorSize),
 		m_rowSize(rowSize),
 		m_frmTime(frmTime),
 		m_resize(resize),
 		m_index({ 0,0 }),
-		m_audio(Audio{ audioPath }) {}
+		m_audio(audio) {}
 
 	/// @brief テクスチャのアニメーション、効果音の再生を行います。
 	/// @return アニメーションの再生が終わるとtrueを返します
@@ -54,8 +54,13 @@ public:
 
 		stopwatch.start();
 		const double time = stopwatch.sF();
-		if (m_index.x == 0 && m_index.y == 0 && m_audio)
-			m_audio.play();
+
+		if (m_audioFlag && m_audio)
+		{
+			m_audio.playOneShot();
+			m_audioFlag = false;
+		}
+
 		if (time > m_frmTime)
 		{
 			stopwatch.restart();
@@ -83,6 +88,9 @@ public:
 		m_texture.uv(static_cast<double>(m_index.x) / m_majorSize, static_cast<double>(m_index.y) / m_rowSize, 1.0 / m_majorSize, 1.0 / m_rowSize).scaled(m_resize).drawAt(pos);
 	}
 
+	/// @brief 回転したアニメーションを描画します
+	/// @param pos 描画する座標です
+	/// @param theta 回転させる角度です
 	void drawAt(const Vec2& pos,double theta) const
 	{
 		m_texture.uv(static_cast<double>(m_index.x) / m_majorSize, static_cast<double>(m_index.y) / m_rowSize, 1.0 / m_majorSize, 1.0 / m_rowSize).scaled(m_resize).rotated(theta).drawAt(pos);
@@ -101,6 +109,9 @@ private:
 	double m_frmTime = 0;
 
 	double m_resize = 1.0;
+
+	//音声を１回だけ鳴らすためのフラグ変数です
+	bool m_audioFlag = true;
 
 	//表示するコマの{列、行}です
 	Point m_index = { 0,0 };

@@ -13,8 +13,13 @@ Game::Game(const InitData& init)
 
 void Game::update()
 {
+
 	gameBGM.play();
-	//Print
+
+	if (KeyP.pressed())
+	{
+		return;
+	}
 
 	//時間管理
 	deltaTime = Scene::DeltaTime();
@@ -104,7 +109,7 @@ void Game::update()
 					int rondomNum = Random(0, 10);
 					if (rondomNum < 3)
 					{
-						itemArr << Item{ rondomNum,it->pos };
+						itemArr << Item{ rondomNum,it->getPos()};
 					}
 				}
 				++it;
@@ -164,13 +169,13 @@ void Game::update()
 
 	//ランダムスポーン
 	spawnTimer += deltaTime;
-	if (spawnTimer > 1.0)
+	if (spawnTimer > eSpawnCoolTime)
 	{
-		spawnTimer -= 1.0;
+		spawnTimer -= eSpawnCoolTime;
 		spawnNum += spawnRate;
 		while (1.0 <= spawnNum)
 		{
-			const double r = Random(10, 30);
+			const double r = Random(310, 330);
 			const double degree = Math::ToRadians(Random(0, 360));
 			enemy_arr << Enemy{ r, degree ,earth_r,enemyHouseRange };
 			spawnNum--;
@@ -207,11 +212,8 @@ void Game::update()
 		//移動処理
 		it->move();
 		//発射処理
-		it->eShotTimer += deltaTime;
-		if ((it->geteShotCoolTime() < it->eShotTimer))
-		{
-			it->shot(eBulletArr, pJet_pos);
-		}
+		it->shot(eBulletArr, pJet_pos);
+
 		++it;
 	}
 	//E弾処理
@@ -342,13 +344,13 @@ void Game::draw() const
 		//敵
 		for (auto& enemy : enemy_arr)
 		{
-			if (enemy.currentHP > 0)
+			if (enemy.checkDeath())
 			{
-				enemy.draw();
+				enemy.explosion_Anime.drawAt(OffsetCircular({ 0,0 }, enemy.getPos().r, enemy.getPos().theta));
 			}
 			else
 			{
-				enemy.explosion_Anime.drawAt(OffsetCircular({ 0,0 }, enemy.pos.r, enemy.pos.theta));
+				enemy.draw();
 			}
 		}
 		//敵弾
@@ -377,6 +379,14 @@ void Game::draw() const
 			}
 			TextureAsset(texName).scaled(0.04).rotated(item.pos.theta).drawAt(OffsetCircular({ 0,0 }, item.pos));
 		}
+		//ピンク線
+		for (int i : step(4))
+		{
+			Circular c1{ earth_r,i * 90_deg };
+			Line{ c1,OffsetCircular({c1},400,Math::ToRadians(60 + 90 * i))}.draw(Palette::Pink);
+			Line{ c1,OffsetCircular({c1},400,Math::ToRadians(-60 + 90 * i))}.draw(Palette::Pink);
+		}
+
 	}
 
 	//-------UI------------

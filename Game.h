@@ -102,7 +102,7 @@ private:
 	Array <Enemy> enemy_arr;
 	const double eBullet_speed = 100.0;
 	const double eBullet_damage = 10.0;
-	const double eSpawnCoolTime = 0.1;
+	const double eSpawnCoolTime = 1.0;
 	double eSpawnTimer = 0;
 	Array <Bullet> eBulletArr;
 	Array <Vec2> fromToRandomArr;
