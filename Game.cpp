@@ -104,7 +104,7 @@ void Game::update()
 					int rondomNum = Random(0, 10);
 					if (rondomNum < 3)
 					{
-						itemArr << Item{ rondomNum,it->r_deg };
+						itemArr << Item{ rondomNum,it->pos };
 					}
 				}
 				++it;
@@ -145,11 +145,11 @@ void Game::update()
 	//-----Item処理------
 	for (auto it = itemArr.begin(); it != itemArr.end();)
 	{
-		if (it->r_deg.x > earth_r)
+		if (it->pos.r > earth_r)
 		{
-			it->r_deg.x -= itemSpeed * deltaTime;
+			it->pos.r -= itemSpeed * deltaTime;
 		}
-		Vec2 rectPos = OffsetCircular({ 0,0 }, it->r_deg.x, it->r_deg.y);
+		Vec2 rectPos = OffsetCircular({ 0,0 }, it->pos);
 		Rect collider{ Arg::center(lround(rectPos.x),lround(rectPos.y)) ,20,20 };
 		if (collider.intersects(pJet_collider))
 		{
@@ -284,13 +284,16 @@ void Game::update()
 	//引数の座標はゲーム内ではなく、回転の処理をした後、スケールを変える前の画面上座標
 	camera.setTargetCenter({ 0,-pJet_r - 90 });
 
-	if (pJet_r < earth_r)
+	if (!getData().testMode)
 	{
-		camera.setTargetScale(cameraScale * (1 - 0.65 * ((earth_r - pJet_r) / earth_r)));
-	}
-	else
-	{
-		camera.setTargetScale(cameraScale);
+		if (pJet_r < earth_r)
+		{
+			camera.setTargetScale(cameraScale * (1 - 0.65 * ((earth_r - pJet_r) / earth_r)));
+		}
+		else
+		{
+			camera.setTargetScale(cameraScale);
+		}
 	}
 
 	mat = Mat3x2::Rotate(-radians, { 0,0 });
@@ -326,7 +329,7 @@ void Game::draw() const
 		{
 			double colorH = (maxShieldHealth - shieldHealth) / maxShieldHealth * 110;
 			Circle{ pJet_collider.center,shieldSize * 30.0 }.draw(ColorF(HSV{ 250 + colorH,0.9,1 }, 0.7));
-			shieldAnime.drawAt(pJet_pos, radians);
+			shieldAnime.drawAt(OffsetCircular({ 0,0 },pJet_r + shieldAnimePosOffset.x,radians + shieldAnimePosOffset.y), radians);
 		}
 
 
@@ -345,7 +348,7 @@ void Game::draw() const
 			}
 			else
 			{
-				enemy.explosion_Anime.drawAt(OffsetCircular({ 0,0 }, enemy.r_deg.x, enemy.r_deg.y));
+				enemy.explosion_Anime.drawAt(OffsetCircular({ 0,0 }, enemy.pos.r, enemy.pos.theta));
 			}
 		}
 		//敵弾
@@ -372,7 +375,7 @@ void Game::draw() const
 			default:
 				break;
 			}
-			TextureAsset(texName).scaled(0.04).rotated(item.r_deg.y).drawAt(OffsetCircular({ 0,0 }, item.r_deg.x, item.r_deg.y));
+			TextureAsset(texName).scaled(0.04).rotated(item.pos.theta).drawAt(OffsetCircular({ 0,0 }, item.pos));
 		}
 	}
 

@@ -103,7 +103,7 @@ private:
 	double m_resize = 1.0;
 
 	//表示するコマの{列、行}です
-	Vec2 m_index = { 0,0 };
+	Point m_index = { 0,0 };
 
 	Stopwatch stopwatch{ StartImmediately::No };
 };

@@ -15,7 +15,7 @@ public:
 	void draw() const override;
 
 private:
-	static constexpr double earth_r = 400.0;
+	static constexpr int32 earth_r = 400;
 	static constexpr double houseSize = 60.0;
 	static constexpr double enemyHouseRange = 200.0;
 	const Circle earth{ 0, 0, earth_r };
@@ -88,7 +88,7 @@ private:
 	double shieldHealth = baseShieldHealth;
 	const double shieldRegenerationRate = 5.0;
 	Anime shieldAnime{ TextureAsset(U"shieldTex"), 4, 5, 0.04, 0.18 };
-	//Vec2 shieldAnimePosOffset{ 0,0 };
+	Vec2 shieldAnimePosOffset{ 3,0 };
 	Array <Vec2> pBullet_posArr;
 	Array <Circle> pBullet_coliArr;
 
@@ -112,13 +112,20 @@ private:
 	struct Item
 	{
 		int itemType;
-		Vec2 r_deg;
+		Circular pos;
 	};
 
 	Array <Item> itemArr;
 
 	// 2D カメラ
 	const double cameraScale = 2.0;
-	Camera2D camera{ Vec2{ 0, 0 }, cameraScale };
+
+	//実行時はデバイス入力によるカメラ移動をオフ
+#if _DEBUG
+	Camera2D camera{ Vec2{ 0, 0 }, cameraScale};
+#else
+	Camera2D camera{ Vec2{ 0, 0 }, cameraScale,CameraControl::None_ };
+#endif
+
 	Mat3x2 mat = Mat3x2::Identity();
 };
