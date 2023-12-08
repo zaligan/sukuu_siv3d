@@ -36,7 +36,7 @@ private:
 
 	Circle collider{ {0,0},10 };
 	Circular from;
-	Circular to;
+	OffsetCircular to;
 	double maxHP = 20.0;
 	Stopwatch stopwatch{ StartImmediately::Yes };
 	static constexpr double eShotCoolTime = 3.0;

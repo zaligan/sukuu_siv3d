@@ -86,13 +86,9 @@ void Enemy::init(double r, double theta)
 	double houseDeg = (static_cast<int>((pos.theta + (Math::HalfPi/2)) / Math::HalfPi) % 4) * Math::HalfPi;
 
 
-	double enemyRandomTheta = Math::ToRadians(Random(-60, 60));
+	double enemyRandomTheta = Math::ToRadians(Random(-60, 60)) + houseDeg;
 	double enemyRandomR = enemyHouseRange + Random(0, 120);
-	//余弦定理してるけどcircularの足し算で行けない？
-	double l = sqrt((earth_r * earth_r) + (enemyRandomR * enemyRandomR) - 2 * earth_r * enemyRandomR * Math::Cos(Math::Pi - enemyRandomTheta));
-	to = { l,houseDeg + asin((enemyRandomR * sin(Math::Pi - enemyRandomTheta)) / l)};
-	if (from.theta - to.theta > Math::Pi)
-		to.theta += 2 * Math::Pi;
+	to = OffsetCircular({ Circular(earth_r,houseDeg) }, enemyRandomR, enemyRandomTheta);
 }
 
 Vec2 Enemy::getCenter() const
