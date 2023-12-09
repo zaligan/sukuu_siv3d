@@ -1,42 +1,66 @@
 ﻿#include "Enemy.h"
 
-Enemy::Enemy(double r, double theta, double earth_r, double enemyHouseRange)
-	:earth_r(earth_r)
-	, enemyHouseRange(enemyHouseRange)
+Enemy::Enemy(double r, double theta)
 {
-	init(r, theta);
+	double spawn_r = m_earthR + r;
+	m_pos = Circular{ spawn_r, theta };
+	m_from = m_pos;
+	//一番近い家のラジアン 0, π/2, π, 3π/2
+	double houseDeg = (static_cast<int>((m_pos.theta + (Math::HalfPi / 2)) / Math::HalfPi) % 4) * Math::HalfPi;
+	double enemyRandomTheta = Math::ToRadians(Random(-60, 60)) + houseDeg;
+	double enemyRandomR = m_enemyHouseRange + Random(0, 120);
+
+	//OffsetCircularからCircularに変換するためVec2を経由
+	m_to = Vec2(OffsetCircular({ Circular(m_earthR,houseDeg) }, enemyRandomR, enemyRandomTheta));
 }
 
 void Enemy::draw() const
 {
 	//collider.draw(Palette::Black);
-	TextureAsset(U"enemyTex").rotated(pos.theta).drawAt(collider.center);
+	if (m_currentHP <= 0)
+	{
+		m_explosionAnime.drawAt(OffsetCircular({ 0,0 }, m_pos.r, m_pos.theta));
+	}
+	else
+	{
+		TextureAsset(U"enemyTex").rotated(m_pos.theta).drawAt(m_collider.center);
+	}
 }
 
-void Enemy::move()
+void Enemy::update()
 {
+	if (m_currentHP <= 0)
+	{
+		m_deathFlag = m_explosionAnime.update();
+	}
+	
+	//移動
 	const double t = Min(stopwatch.sF() / 10, 1.0);
-	pos.r = Math::Lerp(from.r, to.r, t);
-	pos.theta = Math::LerpAngle(from.theta, to.theta, t);
-	collider.setPos(pos);
+	m_pos.r = Math::Lerp(m_from.r, m_to.r, t);
+	m_pos.theta = Math::LerpAngle(m_from.theta, m_to.theta, t);
+	m_collider.setPos(m_pos);
 }
 
-bool Enemy::calcHP(double damage)
+bool Enemy::damage(double damage)
 {
-	currentHP -= damage;
-	deathFlag = currentHP <= 0;
-	return deathFlag;
+	m_currentHP -= damage;
+	return m_currentHP <= 0;
+}
+
+double Enemy::getHP() const
+{
+	return m_currentHP;
 }
 
 bool Enemy::shot(Array<Bullet>& eBulletArr, const Vec2& pJetPos)
 {
 	//eShotCoolTime経過するごとに発射
-	if (stopwatch.sF() > eShotCoolTime * shotCnt)
+	if (stopwatch.sF() > m_eShotCoolTime * m_shotCnt)
 	{
-		shotCnt++;
+		m_shotCnt++;
 
 		const Vec2 directPJet = pJetPos - getCenter();
-		const Vec2 directTown = OffsetCircular({ 0,0 }, earth_r, ((static_cast<int>((pos.theta + (Math::HalfPi / 2)) / Math::HalfPi) % 4) * Math::HalfPi)) - getCollider().center;
+		const Vec2 directTown = OffsetCircular({ 0,0 }, m_earthR, ((static_cast<int>((m_pos.theta + (Math::HalfPi / 2)) / Math::HalfPi) % 4) * Math::HalfPi)) - getCollider().center;
 
 		//プレイヤーと街の近いほうを狙う
 		if (directTown.lengthSq() < directPJet.lengthSq())
@@ -49,7 +73,7 @@ bool Enemy::shot(Array<Bullet>& eBulletArr, const Vec2& pJetPos)
 				direction = Vec2{ 0,1 };
 			}
 
-			eBulletArr << Bullet{ Circle{Arg::center(getCenter()),eBullet_r}, direction };
+			eBulletArr << Bullet{ Circle{Arg::center(getCenter()),eBulletR}, direction };
 		}
 		else
 		{
@@ -61,7 +85,7 @@ bool Enemy::shot(Array<Bullet>& eBulletArr, const Vec2& pJetPos)
 				direction = Vec2{ 0,1 };
 			}
 
-			eBulletArr << Bullet{ Circle{Arg::center(getCenter()),eBullet_r}, directPJet.normalized() };
+			eBulletArr << Bullet{ Circle{Arg::center(getCenter()),eBulletR}, directPJet.normalized() };
 		}
 
 		return true;
@@ -71,35 +95,20 @@ bool Enemy::shot(Array<Bullet>& eBulletArr, const Vec2& pJetPos)
 
 Circle Enemy::getCollider() const
 {
-	return collider;
+	return m_collider;
 }
 
 Circular Enemy::getPos() const
 {
-	return pos;
+	return m_pos;
 }
 
-bool Enemy::checkDeath() const
+bool Enemy::isDeath() const
 {
-	return deathFlag;
-}
-
-void Enemy::init(double r, double theta)
-{
-	currentHP = maxHP;
-	double spawn_r = earth_r + r;
-	pos = Circular{ spawn_r, theta };
-	from = pos;
-	//一番近い家のラジアン 0, π/2, π, 3π/2
-	double houseDeg = (static_cast<int>((pos.theta + (Math::HalfPi/2)) / Math::HalfPi) % 4) * Math::HalfPi;
-	double enemyRandomTheta = Math::ToRadians(Random(-60, 60)) + houseDeg;
-	double enemyRandomR = enemyHouseRange + Random(0, 120);
-
-	//OffsetCircularからCircularに変換するためVec2を経由
-	to = Vec2(OffsetCircular({ Circular(earth_r,houseDeg) }, enemyRandomR, enemyRandomTheta));	
+	return m_deathFlag;
 }
 
 Vec2 Enemy::getCenter() const
 {
-	return collider.center;
+	return m_collider.center;
 }

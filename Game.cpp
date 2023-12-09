@@ -4,7 +4,7 @@
 Game::Game(const InitData& init)
 	: IScene{ init }
 {
-	pJet_HP = pJet_MaxHP;
+	
 	if (not enemyCSV) // もし読み込みに失敗したら
 	{
 		throw Error{ U"Failed to load `EnemyDataSheat.csv`" };
@@ -24,10 +24,10 @@ void Game::update()
 	//時間管理
 	deltaTime = Scene::DeltaTime();
 	sceneTime += deltaTime;
-	pShotTimer += deltaTime;
-	eSpawnTimer += deltaTime;
 
-	if (pJet_HP <= 0)
+	player.update(deltaTime);
+
+	if (player.getHP() <= 0)
 	{
 		gameOverFlag = true;
 	}
@@ -43,153 +43,135 @@ void Game::update()
 
 	//-------プレイヤー-------
 	//p操作受付
-	shieldFlag = KeyK.pressed();
-	if (KeyK.up())
-	{
-		shieldAnime.reset();
-	}
+	
 	if (KeyA.pressed() || KeyLeft.pressed())
 	{
-		radians -= 2 * Math::Pi * deltaTime / (maxRotatSpeed + ((minRotatSpeed - maxRotatSpeed) * ((pJet_r - moveRange.minRadius) / (moveRange.maxRadius - moveRange.minRadius))));
+		player.move(Directions::Left);
 	}
 	if (KeyD.pressed() || KeyRight.pressed())
 	{
-		radians += 2 * Math::Pi * deltaTime / (maxRotatSpeed + ((minRotatSpeed - maxRotatSpeed) * ((pJet_r - moveRange.minRadius) / (moveRange.maxRadius - moveRange.minRadius))));
+		player.move(Directions::Right);
 	}
 	if (KeyW.pressed() || KeyUp.pressed())
 	{
-		pJet_r += vertSpeed * deltaTime;
+		player.move(Directions::Up);
 	}
 	if (KeyS.pressed() || KeyDown.pressed())
 	{
-		pJet_r -= vertSpeed * deltaTime;
+		player.move(Directions::Down);
 	}
-	//p移動
-	pJet_r = Clamp(pJet_r, moveRange.minRadius, moveRange.maxRadius);
-	pJet_pos = OffsetCircular({ 0,0 }, pJet_r, radians);
-	pJet_collider.setCenter(pJet_pos);
+	//シールド
+	player.useShield(KeyK.pressed());
 
 	//p弾発射処理
-	if (!shieldFlag)
+	if (KeyJ.pressed())
 	{
-		double coolTime = pShotCoolTime * std::pow(shotSpeedRate, pUpgrade.at(0));
-		if ((coolTime < pShotTimer) && KeyJ.pressed())
-		{
-			pShotTimer = 0;
-			pBullet_posArr << Vec2{ pJet_r + 10 ,radians };
-			pBullet_coliArr << Circle{ 0,0,pBullet_r };
-			pShotAud.playOneShot();
-		}
+		player.shot(pBulletArr);
 	}
-	for (auto& arr : pBullet_posArr)
+
+	//弾の更新
+	for (auto bulletIter = pBulletArr.begin(); bulletIter != pBulletArr.end();)
 	{
-		arr.x += pBullet_speed * deltaTime;
-	}
-	//p弾移動＆消滅処理
-	for (int i = 0; i < pBullet_coliArr.size(); i++)
-	{
-		pBullet_coliArr.at(i).setPos(OffsetCircular({ 0,0 }, pBullet_posArr.at(i).x, pBullet_posArr.at(i).y));
-		if (pBullet_posArr.at(i).x > pJet_r + 400)
+		//移動
+		Vec2 update(bulletIter->direction * pBullet_speed  * deltaTime);
+		bulletIter->collider.setCenter(bulletIter->collider.center + update);
+
+		//弾自身が範囲外なら削除
+		if (bulletIter->collider.x < -bulletDeleteRange || bulletDeleteRange < bulletIter->collider.x || bulletIter->collider.y < -bulletDeleteRange || bulletIter->collider.y > bulletDeleteRange)
 		{
-			pBullet_coliArr.erase(pBullet_coliArr.begin() + i);
-			pBullet_posArr.erase(pBullet_posArr.begin() + i);
-			i--;
+			bulletIter = pBulletArr.erase(bulletIter);
 			continue;
 		}
-		//p弾Hit処理
-		for (auto it = enemy_arr.begin(); it != enemy_arr.end();)
+
+		//弾と敵の衝突処理
+		bool isHit = false;
+		for (auto enemyIter = eArr.begin(); enemyIter != eArr.end();)
 		{
-			if (!it->checkDeath() && (pBullet_coliArr.at(i).intersects(it->getCollider())))
+			if (bulletIter->collider.intersects(enemyIter->getCollider()))
 			{
-				pBullet_coliArr.erase(pBullet_coliArr.begin() + i);
-				pBullet_posArr.erase(pBullet_posArr.begin() + i);
-				i--;
-				if (it->calcHP(pBullet_damage))
-				{
-					int rondomNum = Random(0, 10);
-					if (rondomNum < 3)
-					{
-						itemArr << Item{ rondomNum,it->getPos()};
-					}
-				}
-				++it;
+				enemyIter->damage(pBulletDamage);
+				bulletIter = pBulletArr.erase(bulletIter);
+				isHit = true;
 				break;
 			}
 			else
 			{
-				++it;
+				enemyIter++;
 			}
 		}
+		if (!isHit)
+		{
+			bulletIter++;
+		}
 	}
 
-	//----シールド処理------
-	//アップグレード強化
-	maxShieldHealth = baseShieldHealth + pUpgrade.at(2) * shieldUpgRate;
-	//自然回復
-	shieldHealth = std::min(maxShieldHealth, shieldHealth + shieldRegenerationRate * deltaTime);
-	//e弾処理
-	if (shieldFlag && shieldHealth > 0)
-	{
-		Circle shieldCollider{ pJet_collider.center,shieldSize * 30.0 };
-		shieldAnime.update();
-		for (auto it = eBulletArr.begin(); it != eBulletArr.end();)
-		{
-			if (it->collider.intersects(shieldCollider))
-			{
-				shieldHealth = std::max(-shieldRegenerationRate, shieldHealth - eBullet_damage);
-				it = eBulletArr.erase(it);
-				continue;
-			}
-			it++;
-		}
-		eBulletArr.remove_if([s = shieldCollider](const Bullet& b) {return b.collider.intersects(s); });
+	////----シールド処理------
+	////アップグレード強化
+	//maxShieldHealth = baseShieldHealth + pUpgrade.at(2) * shieldUpgRate;
+	////自然回復
+	//shieldHealth = std::min(maxShieldHealth, shieldHealth + shieldRegenerationRate * deltaTime);
+	////e弾処理
+	//if (shieldFlag && shieldHealth > 0)
+	//{
+	//	Circle shieldCollider{ pJet_collider.center,shieldSize * 30.0 };
+	//	shieldAnime.update();
+	//	for (auto it = eBulletArr.begin(); it != eBulletArr.end();)
+	//	{
+	//		if (it->collider.intersects(shieldCollider))
+	//		{
+	//			shieldHealth = std::max(-shieldRegenerationRate, shieldHealth - eBullet_damage);
+	//			it = eBulletArr.erase(it);
+	//			continue;
+	//		}
+	//		it++;
+	//	}
+	//	eBulletArr.remove_if([s = shieldCollider](const Bullet& b) {return b.collider.intersects(s); });
 
-	}
+	//}
 
 
-	//-----Item処理------
-	for (auto it = itemArr.begin(); it != itemArr.end();)
-	{
-		if (it->pos.r > earth_r)
-		{
-			it->pos.r -= itemSpeed * deltaTime;
-		}
-		Vec2 rectPos = OffsetCircular({ 0,0 }, it->pos);
-		Rect collider{ Arg::center(lround(rectPos.x),lround(rectPos.y)) ,20,20 };
-		if (collider.intersects(pJet_collider))
-		{
-			pUpgrade.at(it->itemType)++;
-			it = itemArr.erase(it);
-			continue;
-		}
-		it++;
-	}
+	////-----Item処理------
+	//for (auto it = itemArr.begin(); it != itemArr.end();)
+	//{
+	//	if (it->pos.r > earthR)
+	//	{
+	//		it->pos.r -= itemSpeed * deltaTime;
+	//	}
+	//	Vec2 rectPos = OffsetCircular({ 0,0 }, it->pos);
+	//	Rect collider{ Arg::center(lround(rectPos.x),lround(rectPos.y)) ,20,20 };
+	//	if (collider.intersects(pJet_collider))
+	//	{
+	//		pUpgrade.at(it->itemType)++;
+	//		it = itemArr.erase(it);
+	//		continue;
+	//	}
+	//	it++;
+	//}
 
 	//------Enemy処理--------
 
 	//ランダムスポーン
-	spawnTimer += deltaTime;
-	if (spawnTimer > eSpawnCoolTime)
+	eSpawnTimer += deltaTime;
+	if (eSpawnTimer > spawnIntervalSeconds)
 	{
-		spawnTimer -= eSpawnCoolTime;
-		spawnNum += spawnRate;
-		while (1.0 <= spawnNum)
+		eSpawnTimer -= spawnIntervalSeconds;
+		for(int i:step(spawnCnt))
 		{
-			const double r = Random(310, 330);
-			const double degree = Math::ToRadians(Random(0, 360));
-			enemy_arr << Enemy{ r, degree ,earth_r,enemyHouseRange };
-			spawnNum--;
+			const double r = Random(minSpawnR,maxSpawnR );
+			const double theta = Math::ToRadians(Random(minSpawnTheta, maxSpawnTheta));
+			eArr << Enemy{ r, theta };
 		}
 	}
 
+	//TODO:CSVファイルが1行の時のエラー対応
 	//CSVスポーン １行目は項目のためスルー
 	while (index + 2 <= enemyCSV.rows())
 	{
 		if (Parse<int32>(enemyCSV[index + 1][0]) < sceneTime)
 		{
 			const double r = Parse<double>(enemyCSV[index + 1][1]);
-			const double degree = Math::ToRadians(Parse<double>(enemyCSV[index + 1][2]));
-			enemy_arr << Enemy{ r, degree, earth_r, enemyHouseRange };
+			const double theta = Math::ToRadians(Parse<double>(enemyCSV[index + 1][2]));
+			eArr << Enemy{ r, theta };
 			index++;
 		}
 		else
@@ -199,20 +181,17 @@ void Game::update()
 	}
 
 	//e本体処理
-	for (auto it = enemy_arr.begin(); it != enemy_arr.end();)
+	for (auto it = eArr.begin(); it != eArr.end();)
 	{
-		if (it->checkDeath())
+		if (it->isDeath())
 		{
-			if (it->explosion_Anime.update())
-			{
-				it = enemy_arr.erase(it);
-				continue;
-			}
+			it = eArr.erase(it);
+			continue;
 		}
 		//移動処理
-		it->move();
+		it->update();
 		//発射処理
-		it->shot(eBulletArr, pJet_pos);
+		it->shot(eBulletArr, player.getCenter());
 
 		++it;
 	}
@@ -221,8 +200,8 @@ void Game::update()
 	for (auto& bullet : eBulletArr)
 	{
 		// TODO: bullet.direction を単位ベクトルにしたので、eBullet_speed の値は再検討が必要
-		Vec2 move(bullet.direction * eBullet_speed * deltaTime);
-		bullet.collider.setCenter(bullet.collider.center + move);
+		Vec2 update(bullet.direction * eBullet_speed * deltaTime);
+		bullet.collider.setCenter(bullet.collider.center + update);
 	}
 	//e弾hit
 	for (auto it = eBulletArr.begin(); it != eBulletArr.end();)
@@ -244,11 +223,11 @@ void Game::update()
 			continue;
 		}
 
-		if (it->collider.intersects(pJet_collider))
+		if (it->collider.intersects(player.getCollider()))
 		{
 			if (!getData().testMode)
 			{
-				pJet_HP -= eBullet_damage;
+				player.damage(eBullet_damage);
 			}
 			it = eBulletArr.erase(it);
 		}
@@ -266,7 +245,7 @@ void Game::update()
 		}
 	}
 	//範囲外の弾は削除
-	eBulletArr.remove_if([](const Bullet& b) {return (b.collider.x < -1000) || (b.collider.x > 1000) || (b.collider.y < -1000) || (b.collider.y > 1000); });
+	eBulletArr.remove_if([](const Bullet& b) {return (b.collider.x < -bulletDeleteRange) || (b.collider.x > bulletDeleteRange) || (b.collider.y < -bulletDeleteRange) || (b.collider.y > bulletDeleteRange); });
 
 	//Town処理
 	for (auto& town : townArr)
@@ -284,13 +263,12 @@ void Game::update()
 
 	//カメラ計算
 	//引数の座標はゲーム内ではなく、回転の処理をした後、スケールを変える前の画面上座標
-	camera.setTargetCenter({ 0,-pJet_r - 90 });
-
-	if (!getData().testMode)
+	camera.setTargetCenter(Circular{player.getR() + cameraOffsetY,0});
+	if (cameraMode)
 	{
-		if (pJet_r < earth_r)
+		if (player.getR()< earthR)
 		{
-			camera.setTargetScale(cameraScale * (1 - 0.65 * ((earth_r - pJet_r) / earth_r)));
+			camera.setTargetScale(cameraScale * (1 - 0.65 * ((earthR - player.getR()) / earthR)));
 		}
 		else
 		{
@@ -298,7 +276,7 @@ void Game::update()
 		}
 	}
 
-	mat = Mat3x2::Rotate(-radians, { 0,0 });
+	mat = Mat3x2::Rotate(-player.getTheta(), {0,0});
 	camera.update();
 }
 
@@ -318,40 +296,32 @@ void Game::draw() const
 		for (int i = 0; i < 100; i++)
 		{
 			double tileDeg = Math::Pi * 2 / 100 * i;
-			TextureAsset(U"earthTile").scaled(0.07).rotated(tileDeg).drawAt(OffsetCircular({ 0,0 }, earth_r, tileDeg));
+			TextureAsset(U"earthTile").scaled(0.07).rotated(tileDeg).drawAt(OffsetCircular({ 0,0 }, earthR, tileDeg));
 		}
-		house.scaled(0.8).drawAt(0, -earth_r);
-		house.scaled(0.8).rotated(Math::HalfPi).drawAt(earth_r, 0);
-		house.scaled(0.8).rotated(Math::Pi).drawAt(0, earth_r);
-		house.scaled(0.8).rotated(-Math::HalfPi).drawAt(-earth_r, 0);
+		house.scaled(0.8).drawAt(0, -earthR);
+		house.scaled(0.8).rotated(Math::HalfPi).drawAt(earthR, 0);
+		house.scaled(0.8).rotated(Math::Pi).drawAt(0, earthR);
+		house.scaled(0.8).rotated(-Math::HalfPi).drawAt(-earthR, 0);
 
 		//プレイヤー
-		pJetTex.scaled(playerSize).rotated(radians).drawAt(pJet_pos);
-		if (shieldFlag && shieldHealth > 0)
+		pJetTex.scaled(playerSize).rotated(player.getTheta()).drawAt(player.getCenter());
+		/*if (shieldFlag && shieldHealth > 0)
 		{
 			double colorH = (maxShieldHealth - shieldHealth) / maxShieldHealth * 110;
 			Circle{ pJet_collider.center,shieldSize * 30.0 }.draw(ColorF(HSV{ 250 + colorH,0.9,1 }, 0.7));
 			shieldAnime.drawAt(OffsetCircular({ 0,0 },pJet_r + shieldAnimePosOffset.x,radians + shieldAnimePosOffset.y), radians);
-		}
+		}*/
 
 
 		//p弾
-		for (auto& bullet : pBullet_coliArr)
+		for (auto& bullet : pBulletArr)
 		{
-			bullet.draw(Palette::Black);
-			pBullet_tex.rotated(radians).drawAt(bullet.center);
+			TextureAsset(U"pBullet_tex").rotated(player.getTheta()).drawAt(bullet.collider.center);
 		}
 		//敵
-		for (auto& enemy : enemy_arr)
+		for (auto& enemy : eArr)
 		{
-			if (enemy.checkDeath())
-			{
-				enemy.explosion_Anime.drawAt(OffsetCircular({ 0,0 }, enemy.getPos().r, enemy.getPos().theta));
-			}
-			else
-			{
-				enemy.draw();
-			}
+			enemy.draw();
 		}
 		//敵弾
 		for (auto& eBullet : eBulletArr)
@@ -382,11 +352,10 @@ void Game::draw() const
 		//ピンク線
 		for (int i : step(4))
 		{
-			Circular c1{ earth_r,i * 90_deg };
+			Circular c1{ earthR,i * 90_deg };
 			Line{ c1,OffsetCircular({c1},400,Math::ToRadians(60 + 90 * i))}.draw(Palette::Pink);
 			Line{ c1,OffsetCircular({c1},400,Math::ToRadians(-60 + 90 * i))}.draw(Palette::Pink);
 		}
-
 	}
 
 	//-------UI------------

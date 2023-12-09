@@ -9,4 +9,8 @@ struct Bullet
 	Vec2 direction;
 };
 
-constexpr double eBullet_r = 4.0;
+constexpr double pBulletDamage = 10.0;
+constexpr double pBulletR = 4.0;
+
+
+constexpr double eBulletR = 4.0;

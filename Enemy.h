@@ -1,7 +1,8 @@
 ﻿#pragma once
 #include <Siv3D.hpp>
-#include "Anime.h"
+#include "Anime.hpp" 
 #include "Bullet.hpp"
+#include "StageInfo.hpp"
 
 /// @brief CSVから読み取る敵情報の型です
 struct ReadEnemyData
@@ -20,20 +21,22 @@ public:
 	/// @brief 敵を作成します
 	/// @param r 敵が出現する星からの距離です
 	/// @param theta 敵が出現する場所の角度成分です
-	/// @param earth_r 星の半径です敵が出現する原点からの距離は earth_r + r となります
-	/// @param enemyHouseRange 敵が侵入できない家のエリア半径です
-	Enemy(double r, double theta, double earth_r, double enemyHouseRange);
+	Enemy(double r, double theta);
 
 	/// @brief 敵を描画します
 	void draw() const;
 
-	/// @brief 敵を移動します
-	void move();
+	/// @brief 敵を状態を更新します
+	void update();
 
 	/// @brief 体力を計算します
 	/// @param damage 受けるダメージです
 	/// @return 体力が0以下の時false
-	bool calcHP(double damage);
+	bool damage(double damage);
+
+	/// @brief 現在の体力を返します
+	/// @return 現在の体力
+	double getHP() const;
 
 	/// @brief 弾を発射します
 	/// @param eBulletArr 敵のBulletを管理する配列です
@@ -43,7 +46,7 @@ public:
 
 	/// @brief 敵の生死を返します
 	/// @return 敵が死んでいる時true
-	bool checkDeath() const;
+	bool isDeath() const;
 
 	/// @brief 衝突判定のためのCircleを返します。
 	/// @return 衝突判定のためのCircle
@@ -52,22 +55,36 @@ public:
 	/// @brief 現在の座標を返します
 	/// @return 現在の座標
 	Circular getPos() const;
-	
-	Anime explosion_Anime{ TextureAsset(U"eExplosionTex"), 2, 8, 0.03,0.35,AudioAsset(U"eDeathAud")};
 
 private:
-	double currentHP;
-	Circular pos{ 100,0 };
-	Circle collider{ {0,0},10 };
-	Circular from;
-	Circular to;
-	double maxHP = 20.0;
-	Stopwatch stopwatch{ StartImmediately::Yes };
-	static constexpr double eShotCoolTime = 3.0;
-	double earth_r = 0;
-	double enemyHouseRange;
-	bool deathFlag = false;
-	void init(double r, double degree);
-	int32 shotCnt = 1;
+
+	/// @brief 敵の中心を返します
+	/// @return 敵の中心座標
 	Vec2 getCenter() const;
+
+	double m_maxHP = 20.0;
+
+	double m_currentHP = m_maxHP;
+
+	Circular m_pos{ 100,0 };
+
+	Circle m_collider{ {0,0},10 };
+
+	Circular m_from{0,0};
+
+	Circular m_to{0,0};
+
+	Stopwatch stopwatch{ StartImmediately::Yes };
+
+	static constexpr double m_eShotCoolTime = 3.0;
+
+	int32 m_shotCnt = 1;
+
+	double m_earthR = earthR;
+
+	static constexpr double m_enemyHouseRange = enemyHouseRange;
+
+	bool m_deathFlag = false;
+
+	Anime m_explosionAnime{ TextureAsset(U"eExplosionTex"), 2, 8, 0.03,0.35,AudioAsset(U"eDeathAud") };
 };

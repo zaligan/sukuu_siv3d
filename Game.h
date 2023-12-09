@@ -1,8 +1,11 @@
 ﻿#pragma once
-#include"Anime.h"
+#include"Anime.hpp"
 #include"Common.h"
 #include"Enemy.h"
 #include"HPBar.h"
+#include"Player.hpp"
+#include"StageInfo.hpp"
+
 // ゲームシーン
 class Game : public App::Scene
 {
@@ -15,14 +18,16 @@ public:
 	void draw() const override;
 
 private:
-	static constexpr int32 earth_r = 400;
-	static constexpr double houseSize = 60.0;
-	static constexpr double enemyHouseRange = 200.0;
-	const Circle earth{ 0, 0, earth_r };
+	const Circle earth{ 0, 0, earthR };
 	const Texture house{ U"🏠"_emoji };
 	const Font font{ FontMethod::SDF,52,Typeface::Bold };
 	double deltaTime = 0.0;
 	double sceneTime = 0.0;
+
+	static constexpr double playerSize = 1.3;
+	Player player{ playerSize };
+	Array <Bullet> pBulletArr;
+	static constexpr double pBullet_speed = 400.0;
 
 	int arrNum = 0;
 	bool gameOverFlag = false;
@@ -32,7 +37,6 @@ private:
 	const Texture backPic = TextureAsset(U"backPic");
 	const Texture pJetTex = TextureAsset(U"pJetTex");
 	const Texture shieldTex = TextureAsset(U"shieldTex");
-	const Texture pBullet_tex = TextureAsset(U"pBullet_tex");
 	const Texture eBullet_tex = TextureAsset(U"eBullet_tex");
 	const Texture enemy1_tex = TextureAsset(U"enemy1_tex");
 
@@ -45,52 +49,17 @@ private:
 	int32 townHP = 1000;
 	Array <Town> townArr =
 	{
-		Town{Circle{Arg::center(0,-earth_r),houseSize},HPBar{townHP}},
-		Town{Circle{Arg::center(-earth_r,0),houseSize},HPBar{townHP}},
-		Town{Circle{Arg::center(0,earth_r),houseSize},HPBar{townHP}},
-		Town{Circle{Arg::center(earth_r,0),houseSize},HPBar{townHP}},
+		Town{Circle{Arg::center(0,-earthR),houseSize},HPBar{townHP}},
+		Town{Circle{Arg::center(-earthR,0),houseSize},HPBar{townHP}},
+		Town{Circle{Arg::center(0,earthR),houseSize},HPBar{townHP}},
+		Town{Circle{Arg::center(earthR,0),houseSize},HPBar{townHP}},
 	};
+	
 
-	//プレイヤー
-	const double playerSize = 1.3;
-	Circle pJet_collider{ 0,0,playerSize * 10 };
-	const double horizSpeed = 0.5;
-	const double vertSpeed = 200.0;
-	const double maxRotatSpeed = 6.0;//半径bottomの時１周にかかる秒数
-	const double minRotatSpeed = 18.0;//半径topの時１周にかかる秒数
-	//半径方向のプレイヤーが動ける範囲
-	struct MoveRange
-	{
-		double minRadius;
-		double maxRadius;
-	};
-	//const MoveRange moveRange{ earth_r + 60,earth_r + 200 };
-	const MoveRange moveRange{ 100,earth_r + 200 };
-	double pJet_r = moveRange.minRadius;
-	double radians = 0.0;
-	Vec2 pJet_pos{ 0,0 };
-	const double pJet_MaxHP = 1.0;
-	double pJet_HP;
-	const double pBullet_r = 4.0;
-	const double pBullet_speed = 400.0;
-	const double pBullet_damage = 10.0;
-	const double pShotCoolTime = 0.5;
-	double pShotTimer = 0.0;
 	//アップグレード
 	Array <int> pUpgrade = { 0,0,0 };
 	double shotSpeedRate = 0.94;//攻撃強化1ごとにかかる倍率
 	double shieldUpgRate = 15;//防御強化1ごとに加算する耐久値
-	//シールド
-	double shieldSize = 1.0;
-	bool shieldFlag = false;
-	double baseShieldHealth = 200.0;
-	double  maxShieldHealth;
-	double shieldHealth = baseShieldHealth;
-	const double shieldRegenerationRate = 5.0;
-	Anime shieldAnime{ TextureAsset(U"shieldTex"), 4, 5, 0.04, 0.18 };
-	Vec2 shieldAnimePosOffset{ 3,0 };
-	Array <Vec2> pBullet_posArr;
-	Array <Circle> pBullet_coliArr;
 
 	//CSVファイル
 	const CSV enemyCSV{ U"csv/EnemyDataSheat.csv" };
@@ -99,16 +68,31 @@ private:
 	double itemSpeed = 30.0;
 
 	//Enemy
-	Array <Enemy> enemy_arr;
+	Array <Enemy> eArr;
+	Array <Bullet> eBulletArr;
+
+	//敵をスポーンさせる時間間隔です
+	static constexpr double spawnIntervalSeconds = 1.0;
+
+	//spawnIntervalSecondsごとに出現させる敵の数です
+	static constexpr int32 spawnCnt = 1;
+
+	//敵のスポーン時間を管理します
+	double eSpawnTimer = 0;
+
+	//敵が出現する地表からの距離範囲です
+	static constexpr double maxSpawnR = 330;
+	static constexpr double minSpawnR = 310;
+
+	//敵が出現する角度成分(度数法)です
+	static constexpr double maxSpawnTheta = 360;
+	static constexpr double minSpawnTheta = 0;
+
+
 	const double eBullet_speed = 100.0;
 	const double eBullet_damage = 10.0;
-	const double eSpawnCoolTime = 1.0;
-	double eSpawnTimer = 0;
-	Array <Bullet> eBulletArr;
-	Array <Vec2> fromToRandomArr;
-	double spawnTimer = 0;
-	double spawnNum = 0;
-	const double spawnRate = 1.0;
+
+	
 	struct Item
 	{
 		int itemType;
@@ -119,13 +103,10 @@ private:
 
 	// 2D カメラ
 	const double cameraScale = 2.0;
+	static constexpr bool cameraMode = true;
+	static constexpr double cameraOffsetY = 90;
 
-	//実行時はデバイス入力によるカメラ移動をオフ
-#if _DEBUG
-	Camera2D camera{ Vec2{ 0, 0 }, cameraScale};
-#else
 	Camera2D camera{ Vec2{ 0, 0 }, cameraScale,CameraControl::None_ };
-#endif
 
 	Mat3x2 mat = Mat3x2::Identity();
 };

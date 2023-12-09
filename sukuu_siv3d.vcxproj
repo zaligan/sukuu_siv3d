@@ -353,12 +353,14 @@
     <Xml Include="App\example\xml\test.xml" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Anime.h" />
+    <ClInclude Include="Anime.hpp" />
     <ClInclude Include="Bullet.hpp" />
     <ClInclude Include="Common.h" />
     <ClInclude Include="Enemy.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="HPBar.h" />
+    <ClInclude Include="Player.hpp" />
+    <ClInclude Include="StageInfo.hpp" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="Title.h" />
   </ItemGroup>
