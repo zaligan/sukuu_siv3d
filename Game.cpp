@@ -90,6 +90,7 @@ void Game::update()
 			if (bulletIter->collider.intersects(enemyIter->getCollider()))
 			{
 				enemyIter->damage(pBulletDamage);
+				
 				bulletIter = pBulletArr.erase(bulletIter);
 				isHit = true;
 				break;
@@ -105,48 +106,44 @@ void Game::update()
 		}
 	}
 
-	////----シールド処理------
-	////アップグレード強化
+	//----シールド処理------
+	//アップグレード強化
 	//maxShieldHealth = baseShieldHealth + pUpgrade.at(2) * shieldUpgRate;
-	////自然回復
-	//shieldHealth = std::min(maxShieldHealth, shieldHealth + shieldRegenerationRate * deltaTime);
-	////e弾処理
-	//if (shieldFlag && shieldHealth > 0)
-	//{
-	//	Circle shieldCollider{ pJet_collider.center,shieldSize * 30.0 };
-	//	shieldAnime.update();
-	//	for (auto it = eBulletArr.begin(); it != eBulletArr.end();)
-	//	{
-	//		if (it->collider.intersects(shieldCollider))
-	//		{
-	//			shieldHealth = std::max(-shieldRegenerationRate, shieldHealth - eBullet_damage);
-	//			it = eBulletArr.erase(it);
-	//			continue;
-	//		}
-	//		it++;
-	//	}
-	//	eBulletArr.remove_if([s = shieldCollider](const Bullet& b) {return b.collider.intersects(s); });
-
-	//}
+	
+	//e弾VS Shield
+	if (player.isShieldAvailable())
+	{
+		player.shieldUpdate();
+		for (auto it = eBulletArr.begin(); it != eBulletArr.end();)
+		{
+			if (it->collider.intersects(player.getShieldCollider()))
+			{
+				player.shieldDamage(eBulletDamage);
+				it = eBulletArr.erase(it);
+				continue;
+			}
+			it++;
+		}
+	}
 
 
-	////-----Item処理------
-	//for (auto it = itemArr.begin(); it != itemArr.end();)
-	//{
-	//	if (it->pos.r > earthR)
-	//	{
-	//		it->pos.r -= itemSpeed * deltaTime;
-	//	}
-	//	Vec2 rectPos = OffsetCircular({ 0,0 }, it->pos);
-	//	Rect collider{ Arg::center(lround(rectPos.x),lround(rectPos.y)) ,20,20 };
-	//	if (collider.intersects(pJet_collider))
-	//	{
-	//		pUpgrade.at(it->itemType)++;
-	//		it = itemArr.erase(it);
-	//		continue;
-	//	}
-	//	it++;
-	//}
+	//-----Item処理------
+	for (auto it = itemArr.begin(); it != itemArr.end();)
+	{
+		if (it->pos.r > earthR)
+		{
+			it->pos.r -= itemSpeed * deltaTime;
+		}
+		Vec2 rectPos = OffsetCircular({ 0,0 }, it->pos);
+		Rect collider{ Arg::center(lround(rectPos.x),lround(rectPos.y)) ,20,20 };
+		if (collider.intersects(player.getCollider()))
+		{
+			pUpgrade.at(it->itemType)++;
+			it = itemArr.erase(it);
+			continue;
+		}
+		it++;
+	}
 
 	//------Enemy処理--------
 
@@ -185,6 +182,11 @@ void Game::update()
 	{
 		if (it->isDeath())
 		{
+			int32 itemDropChance = Random(0, 99);
+			if (itemDropChance % 10 < 3)
+			{
+				itemArr << Item{ itemDropChance % 10,it->getCenter()};
+			}
 			it = eArr.erase(it);
 			continue;
 		}
@@ -199,8 +201,7 @@ void Game::update()
 	//移動処理
 	for (auto& bullet : eBulletArr)
 	{
-		// TODO: bullet.direction を単位ベクトルにしたので、eBullet_speed の値は再検討が必要
-		Vec2 update(bullet.direction * eBullet_speed * deltaTime);
+		Vec2 update(bullet.direction * eBulletSpeed * deltaTime);
 		bullet.collider.setCenter(bullet.collider.center + update);
 	}
 	//e弾hit
@@ -212,7 +213,9 @@ void Game::update()
 			if (it->collider.intersects(townArr.at(i).collider))
 			{
 				if (!getData().testMode)
-					townArr.at(i).hp.damage(eBullet_damage);
+				{
+					townArr.at(i).hp.damage(eBulletDamage);
+				}
 				it = eBulletArr.erase(it);
 				exsit = true;
 				break;
@@ -227,7 +230,7 @@ void Game::update()
 		{
 			if (!getData().testMode)
 			{
-				player.damage(eBullet_damage);
+				player.damage(eBulletDamage);
 			}
 			it = eBulletArr.erase(it);
 		}
@@ -305,12 +308,10 @@ void Game::draw() const
 
 		//プレイヤー
 		pJetTex.scaled(playerSize).rotated(player.getTheta()).drawAt(player.getCenter());
-		/*if (shieldFlag && shieldHealth > 0)
+		if (player.isShieldAvailable())
 		{
-			double colorH = (maxShieldHealth - shieldHealth) / maxShieldHealth * 110;
-			Circle{ pJet_collider.center,shieldSize * 30.0 }.draw(ColorF(HSV{ 250 + colorH,0.9,1 }, 0.7));
-			shieldAnime.drawAt(OffsetCircular({ 0,0 },pJet_r + shieldAnimePosOffset.x,radians + shieldAnimePosOffset.y), radians);
-		}*/
+			player.shieldDraw(player.getCircular());
+		}
 
 
 		//p弾

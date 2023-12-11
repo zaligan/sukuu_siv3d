@@ -2,7 +2,7 @@
 
 Enemy::Enemy(double r, double theta)
 {
-	double spawn_r = m_earthR + r;
+	double spawn_r = earthR + r;
 	m_pos = Circular{ spawn_r, theta };
 	m_from = m_pos;
 	//一番近い家のラジアン 0, π/2, π, 3π/2
@@ -11,12 +11,11 @@ Enemy::Enemy(double r, double theta)
 	double enemyRandomR = m_enemyHouseRange + Random(0, 120);
 
 	//OffsetCircularからCircularに変換するためVec2を経由
-	m_to = Vec2(OffsetCircular({ Circular(m_earthR,houseDeg) }, enemyRandomR, enemyRandomTheta));
+	m_to = Vec2(OffsetCircular({ Circular(earthR,houseDeg) }, enemyRandomR, enemyRandomTheta));
 }
 
 void Enemy::draw() const
 {
-	//collider.draw(Palette::Black);
 	if (m_currentHP <= 0)
 	{
 		m_explosionAnime.drawAt(OffsetCircular({ 0,0 }, m_pos.r, m_pos.theta));
@@ -60,7 +59,7 @@ bool Enemy::shot(Array<Bullet>& eBulletArr, const Vec2& pJetPos)
 		m_shotCnt++;
 
 		const Vec2 directPJet = pJetPos - getCenter();
-		const Vec2 directTown = OffsetCircular({ 0,0 }, m_earthR, ((static_cast<int>((m_pos.theta + (Math::HalfPi / 2)) / Math::HalfPi) % 4) * Math::HalfPi)) - getCollider().center;
+		const Vec2 directTown = OffsetCircular({ 0,0 }, earthR, ((static_cast<int>((m_pos.theta + (Math::HalfPi / 2)) / Math::HalfPi) % 4) * Math::HalfPi)) - getCollider().center;
 
 		//プレイヤーと街の近いほうを狙う
 		if (directTown.lengthSq() < directPJet.lengthSq())
@@ -98,17 +97,12 @@ Circle Enemy::getCollider() const
 	return m_collider;
 }
 
-Circular Enemy::getPos() const
-{
-	return m_pos;
-}
-
 bool Enemy::isDeath() const
 {
 	return m_deathFlag;
 }
 
-Vec2 Enemy::getCenter() const
+Circular Enemy::getCenter() const
 {
-	return m_collider.center;
+	return m_pos;
 }

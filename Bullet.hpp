@@ -14,3 +14,5 @@ constexpr double pBulletR = 4.0;
 
 
 constexpr double eBulletR = 4.0;
+const double eBulletSpeed = 100.0;
+const double eBulletDamage = 10.0;

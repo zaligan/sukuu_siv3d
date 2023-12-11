@@ -26,6 +26,7 @@ private:
 
 	static constexpr double playerSize = 1.3;
 	Player player{ playerSize };
+
 	Array <Bullet> pBulletArr;
 	static constexpr double pBullet_speed = 400.0;
 
@@ -88,9 +89,6 @@ private:
 	static constexpr double maxSpawnTheta = 360;
 	static constexpr double minSpawnTheta = 0;
 
-
-	const double eBullet_speed = 100.0;
-	const double eBullet_damage = 10.0;
 
 	
 	struct Item

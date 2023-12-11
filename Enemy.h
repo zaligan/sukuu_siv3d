@@ -31,7 +31,7 @@ public:
 
 	/// @brief 体力を計算します
 	/// @param damage 受けるダメージです
-	/// @return 体力が0以下の時false
+	/// @return 体力が0以下の時true
 	bool damage(double damage);
 
 	/// @brief 現在の体力を返します
@@ -52,15 +52,11 @@ public:
 	/// @return 衝突判定のためのCircle
 	Circle getCollider() const;
 
-	/// @brief 現在の座標を返します
-	/// @return 現在の座標
-	Circular getPos() const;
-
-private:
-
 	/// @brief 敵の中心を返します
 	/// @return 敵の中心座標
-	Vec2 getCenter() const;
+	Circular getCenter() const;
+
+private:
 
 	double m_maxHP = 20.0;
 
@@ -79,8 +75,6 @@ private:
 	static constexpr double m_eShotCoolTime = 3.0;
 
 	int32 m_shotCnt = 1;
-
-	double m_earthR = earthR;
 
 	static constexpr double m_enemyHouseRange = enemyHouseRange;
 

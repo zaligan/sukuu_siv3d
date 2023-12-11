@@ -25,7 +25,8 @@ public:
 		m_deltaTime = deltaTime;
 		m_shotTimer += m_deltaTime;
 		m_collider.setCenter(m_pos);
-
+		//自然回復
+		m_shieldCurrentHP = std::min(m_maxShieldHP, m_shieldCurrentHP + m_shieldRegenerationRate * deltaTime);
 	}
 
 	void move( Directions directions)
@@ -68,6 +69,8 @@ public:
 			Vec2 direction = Vec2(Circular{1,getTheta() }).normalized();
 
 			bulletArr << Bullet{ Circle{getCenter(),pBulletR}, direction };
+
+			AudioAsset(U"pShotAud").playOneShot();
 		}
 	}
 
@@ -79,15 +82,6 @@ public:
 	void damage(double damege)
 	{
 		m_currentHP -= damege;
-	}
-
-	void useShield(bool flag)
-	{
-		if (m_shieldFlag && !flag)
-		{
-			m_shieldAnime.reset();
-		}
-		m_shieldFlag = flag;
 	}
 
 	Vec2 getCenter() const
@@ -114,7 +108,50 @@ public:
 	{
 		return m_collider;
 	}
+	//シールド関連
 
+	void useShield(bool flag)
+	{
+		//flagが true -> false に変わったら
+		if (m_shieldFlag && !flag)
+		{
+			m_shieldAnime.reset();
+		}
+
+		m_shieldFlag = flag;
+	}
+
+	bool isShieldAvailable() const
+	{
+		return m_shieldFlag && m_shieldCurrentHP > 0;
+	}
+
+	bool shieldUpdate()
+	{
+		m_shieldCollider.setCenter(m_pos);
+		return m_shieldAnime.update();
+	}
+
+	Circle getShieldCollider()
+	{
+		return m_shieldCollider;
+	}
+
+	void shieldDamage(double damage)
+	{
+		m_shieldCurrentHP -= damage;
+	}
+
+	void shieldDraw(Circular pos) const
+	{
+		m_shieldCollider.draw(Palette::Dodgerblue);
+		m_shieldAnime.drawAt(Circular(pos.r + m_shieldAnimePosOffset.r, pos.theta + m_shieldAnimePosOffset.theta), pos.theta);
+	}
+
+	void shieldRestoreHP(double heal)
+	{
+		m_shieldCurrentHP += heal;
+	}
 	
 private:
 	
@@ -145,12 +182,12 @@ private:
 	//シールド
 	double m_shieldSize = 1.0;
 	bool m_shieldFlag = false;
-	double m_baseShieldHealth = 200.0;
-	double  m_maxShieldHealth;
-	double m_shieldHealth = m_baseShieldHealth;
+	double m_baseShieldHP = 200.0;
+	double  m_maxShieldHP = 200.0;
+	double m_shieldCurrentHP = m_baseShieldHP;
 	static constexpr double m_shieldRegenerationRate = 5.0;
 	Anime m_shieldAnime{ TextureAsset(U"shieldTex"), 4, 5, 0.04, 0.18 };
-	Vec2 m_shieldAnimePosOffset{ 3,0 };
-
+	Circular m_shieldAnimePosOffset{ 3,0 };
+	Circle m_shieldCollider{ m_shieldSize * 30.0 };
 
 };
