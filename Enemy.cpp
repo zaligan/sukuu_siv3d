@@ -72,7 +72,7 @@ bool Enemy::shot(Array<Bullet>& eBulletArr, const Vec2& pJetPos)
 				direction = Vec2{ 0,1 };
 			}
 
-			eBulletArr << Bullet{ Circle{Arg::center(getCenter()),eBulletR}, direction };
+			eBulletArr << Bullet{ EnemyBullet,0,Circle{Arg::center(getCenter()),eBulletR}, direction };
 		}
 		else
 		{
@@ -84,7 +84,7 @@ bool Enemy::shot(Array<Bullet>& eBulletArr, const Vec2& pJetPos)
 				direction = Vec2{ 0,1 };
 			}
 
-			eBulletArr << Bullet{ Circle{Arg::center(getCenter()),eBulletR}, directPJet.normalized() };
+			eBulletArr << Bullet{ EnemyBullet,0, Circle{Arg::center(getCenter()),eBulletR}, directPJet.normalized() };
 		}
 
 		return true;
@@ -106,3 +106,19 @@ Circular Enemy::getCenter() const
 {
 	return m_pos;
 }
+
+bool Enemy::isHitThisBullet(int32 bulletID)
+{
+	for (auto& m_bulletID : m_hitEnhancedBulletArr)
+	{
+		if (m_bulletID == bulletID)
+		{
+			return true;
+		}
+	}
+	m_hitEnhancedBulletArr << bulletID;
+	return false;
+}
+
+
+

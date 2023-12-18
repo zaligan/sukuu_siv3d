@@ -13,37 +13,63 @@ Game::Game(const InitData& init)
 
 void Game::update()
 {
-
-	gameBGM.play();
-
 	if (KeyP.pressed())
 	{
 		return;
+	}
+	gameBGM.play();
+
+	if(showInstructionsFlag)
+	{
+		if (KeyJ.pressed())
+		{
+			showInstructionsFlag = false;
+		}
+		return;
+	}
+
+	//ゲームの状態遷移
+	switch (gameState)
+	{
+	case Game::play:
+		break;
+
+	case Game::gameOver:
+		if (KeyJ.down())
+		{
+			changeScene(State::Title);
+		}
+		return;
+
+	case Game::clear:
+		if (KeyJ.down())
+		{
+			changeScene(State::Title);
+		}
+		return;
+
+	default:
+		break;
 	}
 
 	//時間管理
 	deltaTime = Scene::DeltaTime();
 	sceneTime += deltaTime;
 
-	player.update(deltaTime);
+	if (sceneTime > clearTime)
+	{
+		gameState = clear;
+	}
 
 	if (player.getHP() <= 0)
 	{
-		gameOverFlag = true;
-	}
-	//ゲームオーバー
-	if (gameOverFlag)
-	{
-		if (KeyJ.down())
-		{
-			changeScene(State::Title);
-		}
-		return;
+		gameState = gameOver;
 	}
 
 	//-------プレイヤー-------
 	//p操作受付
-	
+	player.update(deltaTime);
+
 	if (KeyA.pressed() || KeyLeft.pressed())
 	{
 		player.move(Directions::Left);
@@ -60,14 +86,18 @@ void Game::update()
 	{
 		player.move(Directions::Down);
 	}
-	//シールド
+	//攻撃orシールド展開
 	player.useShield(KeyK.pressed());
 
-	//p弾発射処理
-	if (KeyJ.pressed())
+	if (KeyJ.pressed() && !KeyK.pressed())
 	{
 		player.shot(pBulletArr);
 	}
+	
+	
+
+	player.enhancedPlayer(KeyH.pressed());
+
 
 	//弾の更新
 	for (auto bulletIter = pBulletArr.begin(); bulletIter != pBulletArr.end();)
@@ -89,9 +119,25 @@ void Game::update()
 		{
 			if (bulletIter->collider.intersects(enemyIter->getCollider()))
 			{
-				enemyIter->damage(pBulletDamage);
-				
-				bulletIter = pBulletArr.erase(bulletIter);
+				switch (bulletIter->type)
+				{
+				case Normal:
+					enemyIter->damage(pBulletDamage);
+					bulletIter = pBulletArr.erase(bulletIter);					
+					break;
+
+				case Enhanced:
+					if (!enemyIter->isHitThisBullet(bulletIter->ID))
+					{
+						enemyIter->damage(pEnhancedBulletDamage);
+					}
+					bulletIter++;
+					break;
+
+				default:
+					break;
+				}
+
 				isHit = true;
 				break;
 			}
@@ -255,7 +301,7 @@ void Game::update()
 	{
 		if (town.hp.getHP() <= 0)
 		{
-			gameOverFlag = true;
+			gameState = gameOver;
 		}
 	}
 	//HPBar
@@ -301,10 +347,12 @@ void Game::draw() const
 			double tileDeg = Math::Pi * 2 / 100 * i;
 			TextureAsset(U"earthTile").scaled(0.07).rotated(tileDeg).drawAt(OffsetCircular({ 0,0 }, earthR, tileDeg));
 		}
-		house.scaled(0.8).drawAt(0, -earthR);
-		house.scaled(0.8).rotated(Math::HalfPi).drawAt(earthR, 0);
-		house.scaled(0.8).rotated(Math::Pi).drawAt(0, earthR);
-		house.scaled(0.8).rotated(-Math::HalfPi).drawAt(-earthR, 0);
+
+		for (int32 i:step(townArr.size()))
+		{
+			double townRotate = Math::ToRadians(i * 90);
+			TextureAsset(U"townTex").scaled(0.2).rotated(townRotate).drawAt(Circular(earthR + townPosOffset.r,townRotate + townPosOffset.theta));
+		}
 
 		//プレイヤー
 		pJetTex.scaled(playerSize).rotated(player.getTheta()).drawAt(player.getCenter());
@@ -317,7 +365,17 @@ void Game::draw() const
 		//p弾
 		for (auto& bullet : pBulletArr)
 		{
-			TextureAsset(U"pBullet_tex").rotated(player.getTheta()).drawAt(bullet.collider.center);
+			switch (bullet.type)
+			{
+			case Normal:
+				TextureAsset(U"pBullet_tex").rotated(player.getTheta()).drawAt(bullet.collider.center);
+				break;
+			case Enhanced:
+				TextureAsset(U"pEnhancedBullet_tex").rotated(player.getTheta()-90_deg).drawAt(bullet.collider.center);
+				break;
+			default:
+				break;
+			}
 		}
 		//敵
 		for (auto& enemy : eArr)
@@ -333,33 +391,35 @@ void Game::draw() const
 		for (auto& item : itemArr)
 		{
 
-			String texName;
+			String itemType;
 			switch (item.itemType)
 			{
 			case 0:
-				texName = U"Attack_Item";
+				itemType = U"Attack_Item";
 				break;
 			case 1:
-				texName = U"Protect_Item";
+				itemType = U"Protect_Item";
 				break;
 			case 2:
-				texName = U"Special_Item";
+				itemType = U"Special_Item";
 				break;
 			default:
 				break;
 			}
-			TextureAsset(texName).scaled(0.04).rotated(item.pos.theta).drawAt(OffsetCircular({ 0,0 }, item.pos));
-		}
-		//ピンク線
-		for (int i : step(4))
-		{
-			Circular c1{ earthR,i * 90_deg };
-			Line{ c1,OffsetCircular({c1},400,Math::ToRadians(60 + 90 * i))}.draw(Palette::Pink);
-			Line{ c1,OffsetCircular({c1},400,Math::ToRadians(-60 + 90 * i))}.draw(Palette::Pink);
+			TextureAsset(itemType).scaled(0.04).rotated(item.pos.theta).drawAt(OffsetCircular({ 0,0 }, item.pos));
 		}
 	}
 
 	//-------UI------------
+
+	if (showInstructionsFlag)
+	{
+		TextureAsset(U"howToPlayTex").scaled(1.3).drawAt(Scene::Center());
+	}
+
+	//残り時間
+	FontAsset(U"townHPFont")(U"{:.0f}"_fmt( clearTime - sceneTime)).drawAt(80,Scene::Center().x, 80);
+
 	//街のHP
 	double interval = 75;
 	Array<String> townNameArr = { U"普通の街 HP",U"攻撃の街 HP" ,U"防御の街 HP" ,U"特殊の街 HP" };
@@ -388,10 +448,20 @@ void Game::draw() const
 	TextureAsset(U"Special_Item").scaled(0.05).drawAt(1030, 1050);
 
 	//GameOver
-	if (gameOverFlag)
+	switch (gameState)
 	{
+	case Game::play:
+		break;
+	case Game::gameOver:
 		font(U"GMAE OVER").drawAt(Scene::Center(), Palette::Gray);
-		font(U"Press J Key").drawAt(20, { Scene::Center().x,350 }, Palette::Gray);
+		font(U"Press J Key").drawAt(40, { Scene::Center().x,Scene::Center().y + 100 }, Palette::Gray);
+		break;
+	case Game::clear:
+		font(U"CLEAR!").drawAt(Scene::Center(), Palette::Gray);
+		font(U"Press J Key").drawAt(40, { Scene::Center().x,Scene::Center().y + 100 }, Palette::Gray);
+		break;
+	default:
+		break;
 	}
 
 	//testモード

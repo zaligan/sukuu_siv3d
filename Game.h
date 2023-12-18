@@ -18,9 +18,21 @@ public:
 	void draw() const override;
 
 private:
-	const Circle earth{ 0, 0, earthR };
-	const Texture house{ U"🏠"_emoji };
+
+	enum GameState
+	{
+		play,
+		gameOver,
+		clear
+	};
+	GameState gameState = play;
+	bool showInstructionsFlag = true;
+
+	static constexpr Circle earth{ 0, 0, earthR };
+
 	const Font font{ FontMethod::SDF,52,Typeface::Bold };
+
+	static constexpr double clearTime = 100.0;
 	double deltaTime = 0.0;
 	double sceneTime = 0.0;
 
@@ -28,10 +40,11 @@ private:
 	Player player{ playerSize };
 
 	Array <Bullet> pBulletArr;
+
 	static constexpr double pBullet_speed = 400.0;
 
 	int arrNum = 0;
-	bool gameOverFlag = false;
+
 	//効果音
 	const Audio gameBGM = AudioAsset(U"gameBGM");
 	const Audio pShotAud = AudioAsset(U"pShotAud");
@@ -55,6 +68,8 @@ private:
 		Town{Circle{Arg::center(0,earthR),houseSize},HPBar{townHP}},
 		Town{Circle{Arg::center(earthR,0),houseSize},HPBar{townHP}},
 	};
+
+	static constexpr Circular townPosOffset{ 30,0 };
 	
 
 	//アップグレード

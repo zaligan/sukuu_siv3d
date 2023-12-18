@@ -56,6 +56,11 @@ public:
 	/// @return 敵の中心座標
 	Circular getCenter() const;
 
+	/// @brief 衝突した弾が初めての衝突か確認して、初めての場合IDをArrayに追加します
+	/// @param bulletID 衝突した弾のIDです
+	/// @return 衝突したことのある弾だった場合trueを返します
+	bool isHitThisBullet(int32 bulletID);
+
 private:
 
 	double m_maxHP = 20.0;
@@ -81,4 +86,6 @@ private:
 	bool m_deathFlag = false;
 
 	Anime m_explosionAnime{ TextureAsset(U"eExplosionTex"), 2, 8, 0.03,0.35,AudioAsset(U"eDeathAud") };
+
+	Array<int32> m_hitEnhancedBulletArr;
 };

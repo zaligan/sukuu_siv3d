@@ -10,7 +10,7 @@ void Main()
 	Window::SetTitle(U"AsteriaSalvare");
 	Scene::SetResizeMode(ResizeMode::Keep);
 	Scene::Resize(1920, 1080);
-	Window::Resize(Size{ 640, 360 });
+	Window::Resize(Size{ 1280, 720 });
 
 #if not _DEBUG
 	Window::SetFullscreen(true);

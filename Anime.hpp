@@ -6,20 +6,22 @@ class Anime
 {
 public:
 	/// @brief Animeを作成します
-	/// @param texture 表示するテクスチャです
-	/// @param rowSize textureが持つコマの行数です
-	/// @param majorSize textureが持つコマの列数です
-	/// @param frmTime １コマの描画時間です(秒)
 	Anime(const Texture& texture, int32 rowSize, int32 majorSize, double frmTime) :
 		Anime(texture, majorSize, rowSize, frmTime, 1.0) {}
 
-	/// @brief Animeを作成します
+	/// @brief サイズを変更したAnimeを作成します
+	Anime(const Texture& texture, int32 rowSize, int32 majorSize, double frmTime, double resize) :
+		Anime(Point(majorSize-1,rowSize-1),texture,majorSize,rowSize,frmTime,resize) {}
+
+	/// @brief ループ再生するAnimeを作成します
+	/// @param reStartIndex ループ再生の開始場所です
 	/// @param texture 表示するテクスチャです
 	/// @param rowSize textureが持つコマの行数です
 	/// @param majorSize textureが持つコマの列数です
 	/// @param frmTime １コマの描画時間です(秒)
 	/// @param resize テクスチャの表示倍率です
-	Anime(const Texture& texture, int32 rowSize, int32 majorSize, double frmTime, double resize) :
+	Anime(Point reStartIndex,const Texture& texture, int32 rowSize, int32 majorSize, double frmTime, double resize) :
+		m_reStartIndex(reStartIndex),
 		m_texture(texture),
 		m_majorSize(majorSize),
 		m_rowSize(rowSize),
@@ -27,7 +29,7 @@ public:
 		m_resize(resize),
 		m_index({ 0,0 }) {}
 
-	/// @brief Animeを作成します
+	/// @brief 効果音付きAnimeを作成します
 	/// @param texture 表示するテクスチャです
 	/// @param rowSize textureが持つコマの行数です
 	/// @param majorSize textureが持つコマの列数です
@@ -35,6 +37,7 @@ public:
 	/// @param resize テクスチャの表示倍率です
 	/// @param audioPath 再生時に鳴らす効果音です
 	Anime(const Texture& texture, int32 rowSize, int32 majorSize, double frmTime, double resize, const Audio& audio) :
+		m_reStartIndex(Point(majorSize - 1, rowSize - 1)),
 		m_texture(texture),
 		m_majorSize(majorSize),
 		m_rowSize(rowSize),
@@ -49,6 +52,7 @@ public:
 	{
 		if (m_index.x == m_majorSize - 1 && m_index.y == m_rowSize-1)
 		{
+			m_index = m_reStartIndex;
 			return true;
 		}
 
@@ -115,6 +119,9 @@ private:
 
 	//表示するコマの{列、行}です
 	Point m_index = { 0,0 };
+
+	//すべてのコマを表示後このコマから再開します
+	Point m_reStartIndex = { 0,0 };
 
 	Stopwatch stopwatch{ StartImmediately::No };
 };
