@@ -54,7 +54,7 @@ double Enemy::getHP() const
 bool Enemy::shot(Array<Bullet>& eBulletArr, const Vec2& pJetPos)
 {
 	//eShotCoolTime経過するごとに発射
-	if (stopwatch.sF() > m_eShotCoolTime * m_shotCnt)
+	if (stopwatch.sF() > m_eShotCoolTime * (m_shotCnt + 1))
 	{
 		m_shotCnt++;
 
@@ -68,7 +68,6 @@ bool Enemy::shot(Array<Bullet>& eBulletArr, const Vec2& pJetPos)
 
 			if (direction.isZero())
 			{
-				// TODO: ゼロベクトルの場合に飛ばす方向はあとで再検討
 				direction = Vec2{ 0,1 };
 			}
 
@@ -80,7 +79,6 @@ bool Enemy::shot(Array<Bullet>& eBulletArr, const Vec2& pJetPos)
 
 			if (direction.isZero())
 			{
-				// TODO: ゼロベクトルの場合に飛ばす方向はあとで再検討
 				direction = Vec2{ 0,1 };
 			}
 

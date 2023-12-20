@@ -30,6 +30,8 @@ struct Bullet
 	Vec2 direction;
 };
 
+/// @brief プレイヤーの弾速
+static constexpr double pBullet_speed = 400.0;
 constexpr double pBulletR = 4.0;
 constexpr double pBulletDamage = 10.0;
 constexpr double pEnhancedBulletR = 8.0;
@@ -38,5 +40,5 @@ constexpr double pEnhancedBulletDamage = 20.0;
 
 
 constexpr double eBulletR = 4.0;
-constexpr double eBulletSpeed = 100.0;
+constexpr double eBulletSpeed = 40.0;
 constexpr double eBulletDamage = 10.0;

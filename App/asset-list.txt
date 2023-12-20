@@ -1,7 +1,8 @@
 Texture	pJetTex	picture/Enemy/GalagianArtwork/raw/player/ship1.png
 Texture	backPic	picture/StarryBackPic.png
 Texture	townPic	picture/shiro_02_gray_roof_red.png
-Texture	shieldTex	picture/player/pipo-btleffect109b.png
+Texture	shieldTex	picture/player/pipo-btleffect206_480.png
+Texture	enhancedEffectTex	picture/player/pipo-btleffect109b.png
 Texture	pBullet_tex	picture/Enemy/GalagianArtwork/raw/projectiles/shotsmall.png
 Texture	pEnhancedBullet_tex	picture/player/projectiles/shot9.png
 Texture	eBullet_tex	picture/Enemy/GalagianArtwork/raw/projectiles/shotoval.png
@@ -16,7 +17,9 @@ Texture	eExplosionTex	picture/explosion.png
 Texture	townTex	picture/stage/shiro_02_gray_roof_blue.png
 Texture	howToPlayTex	picture/howToPlay.png
 Audio	gameBGM	music/battleBGM.mp3
-Audio	pShotAud	music/se_pyun2.mp3
+Audio	pShotAud	music/player/se_pyun2.mp3
+Audio	shieldRestoreAud	music/player/shieldRestore.mp3
+Audio	playerEnhancedAud	music/player/playerEnhanced.mp3
 Audio	eDeathAud	music/maou_se_8bit12.mp3
 Font	townHPFont	font/DotGothic16/DotGothic16-Regular.ttf	18
 Font	titleFont	font/DotGothic16/DotGothic16-Regular.ttf	40

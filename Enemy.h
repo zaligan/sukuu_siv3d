@@ -63,29 +63,42 @@ public:
 
 private:
 
+	/// @brief 最大体力です
 	double m_maxHP = 20.0;
 
+	/// @brief 現在の体力です
 	double m_currentHP = m_maxHP;
 
+	/// @brief 自身の中心の座標です
 	Circular m_pos{ 100,0 };
 
+	/// @brief 衝突範囲です
 	Circle m_collider{ {0,0},10 };
 
+	/// @brief 出現座標です
 	Circular m_from{0,0};
 
+	/// @brief 移動先座標です
 	Circular m_to{0,0};
 
+	/// @brief スポーンしてからの時間を計ります
 	Stopwatch stopwatch{ StartImmediately::Yes };
 
+	/// @brief 攻撃間隔(秒)です
 	static constexpr double m_eShotCoolTime = 3.0;
 
-	int32 m_shotCnt = 1;
+	/// @brief スポーンしてから攻撃した合計数です
+	int32 m_shotCnt = 0;
 
+	/// @brief 敵が街に近づけない範囲です
 	static constexpr double m_enemyHouseRange = enemyHouseRange;
 
+	/// @brief 自身の体力が０以下の時trueとなります
 	bool m_deathFlag = false;
 
+	/// @brief 破壊された時のアニメーションです
 	Anime m_explosionAnime{ TextureAsset(U"eExplosionTex"), 2, 8, 0.03,0.35,AudioAsset(U"eDeathAud") };
 
+	/// @brief 受けたプレイヤーの貫通弾の個別IDを記録します
 	Array<int32> m_hitEnhancedBulletArr;
 };

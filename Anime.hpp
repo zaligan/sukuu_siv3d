@@ -7,11 +7,11 @@ class Anime
 public:
 	/// @brief Animeを作成します
 	Anime(const Texture& texture, int32 rowSize, int32 majorSize, double frmTime) :
-		Anime(texture, majorSize, rowSize, frmTime, 1.0) {}
+		Anime(texture, rowSize, majorSize, frmTime, 1.0) {}
 
 	/// @brief サイズを変更したAnimeを作成します
 	Anime(const Texture& texture, int32 rowSize, int32 majorSize, double frmTime, double resize) :
-		Anime(Point(majorSize-1,rowSize-1),texture,majorSize,rowSize,frmTime,resize) {}
+		Anime(Point(majorSize-1,rowSize-1),texture,rowSize,majorSize,frmTime,resize) {}
 
 	/// @brief ループ再生するAnimeを作成します
 	/// @param reStartIndex ループ再生の開始場所です

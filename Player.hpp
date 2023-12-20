@@ -28,9 +28,42 @@ public:
 	{
 		m_deltaTime = deltaTime;
 		m_shotTimer += m_deltaTime;
+		shieldUpdate();
 		m_collider.setCenter(m_pos);
 		//自然回復
-		m_shieldCurrentHP = std::min(m_maxShieldHP, m_shieldCurrentHP + m_shieldRegenerationRate * deltaTime);
+		if (!m_shieldFlag)
+		{
+			m_shieldCurrentHP = std::min(m_maxShieldHP, m_shieldCurrentHP + m_shieldRegenerationRate * deltaTime);
+		}
+
+		//強化値が一定を超えたら強化モード
+		if (m_enhancePoint > m_enhanceThreshold)
+		{
+			//強化時１度だけ鳴らす
+			if (!m_enhancedMode)
+			{
+				AudioAsset(U"playerEnhancedAud").playOneShot();
+			}
+			m_enhancedMode = true;
+		}
+
+		//強化値が一定を超えたらシールド全回復
+		if (m_enhancePoint > m_shieldRestoreThreshold * (m_shieldRestoreCnt + 1))
+		{
+			m_shieldRestoreCnt++;
+			shieldRestoreHP(m_maxShieldHP - m_shieldCurrentHP);
+		}
+
+		//強化値が0以下の時強化モード解除
+		if (m_enhancePoint <= 0)
+		{
+			m_enhancedMode = false;
+			m_shieldRestoreCnt = 0;
+			m_enhanceEffectAnime.reset();
+		}
+
+		m_enhanceEffectAnime.update();
+		
 	}
 
 	/// @brief 入力に応じてプレイヤーを移動します
@@ -61,9 +94,14 @@ public:
 	/// @brief プレイヤーを描画します
 	void draw() const
 	{
+		TextureAsset(U"pJetTex").scaled(m_playerSize).rotated(m_pos.theta).drawAt(m_pos);
 		if (m_shieldFlag)
 		{
-			m_shieldAnime.drawAt(m_pos, m_pos.r);
+			shieldDraw(m_pos);
+		}
+		if (m_enhancedMode)
+		{
+			m_enhanceEffectAnime.drawAt(m_pos, m_pos.theta);
 		}
 	}
 
@@ -83,6 +121,8 @@ public:
 				bulletArr << Bullet{ Enhanced,m_enhancedBulletID,Circle{getCenter(),pEnhancedBulletR}, direction };
 
 				m_enhancedBulletID++;
+
+				m_enhancePoint = Max(m_enhancePoint- eBulletDamage,0.0);
 
 				AudioAsset(U"pShotAud").playOneShot();
 			}
@@ -156,10 +196,16 @@ public:
 	/// @param flag trueの時シールドを展開します
 	void useShield(bool isShieldUsed)
 	{
-		//flagが true -> false に変わったらアニメーションをリセット
+		//シールドを解除したら
 		if (m_shieldFlag && !isShieldUsed)
 		{
 			m_shieldAnime.reset();
+
+			//非強化状態でシールドを解いたら強化ポイントリセット
+			if (!m_enhancedMode)
+			{
+				m_enhancePoint = 0;
+			}
 		}
 
 		m_shieldFlag = isShieldUsed;
@@ -170,13 +216,6 @@ public:
 	bool isShieldAvailable() const
 	{
 		return m_shieldFlag && m_shieldCurrentHP > 0;
-	}
-
-	/// @brief シールドを更新します
-	void shieldUpdate()
-	{
-		m_shieldCollider.setCenter(m_pos);
-		m_shieldAnime.update();
 	}
 
 	/// @brief シールドの衝突範囲を返します
@@ -193,26 +232,37 @@ public:
 		m_shieldCurrentHP -= damage;
 	}
 
-	/// @brief シールドを描画します
-	/// @param pos 描画する位置です
-	void shieldDraw(Circular pos) const
-	{
-		m_shieldAnime.drawAt(Circular(pos.r + m_shieldAnimePosOffset.r, pos.theta + m_shieldAnimePosOffset.theta), pos.theta);
-	}
-
 	/// @brief シールドを回復します
 	/// @param heal 回復量です
 	void shieldRestoreHP(double heal)
 	{
 		m_shieldCurrentHP += heal;
+		AudioAsset(U"shieldRestoreAud").playOneShot();
 	}
 
-	void enhancedPlayer(bool isEnhanced)
+	void addEnhancePoint(double addPoint)
 	{
-		m_enhancedMode = isEnhanced;
+		m_enhancePoint += addPoint;
 	}
 	
 private:
+
+	/// @brief シールドを更新します
+	void shieldUpdate()
+	{
+		m_shieldCollider.setCenter(m_pos);
+		m_shieldAnime.update();
+	}
+
+	/// @brief シールドを描画します
+	/// @param pos 描画する位置です
+	void shieldDraw(Circular pos) const
+	{
+		double colorH = (m_maxShieldHP - m_shieldCurrentHP) / m_maxShieldHP * 110;
+		m_shieldCollider.draw(ColorF(HSV{ 250 + colorH,0.9,1 }, 0.7));
+		m_shieldAnime.drawAt(Circular(pos.r + m_shieldAnimePosOffset.r, pos.theta + m_shieldAnimePosOffset.theta), pos.theta);
+	}
+
 	//１フレームの時間です
 	double m_deltaTime = 0;
 
@@ -254,8 +304,23 @@ private:
 	//射撃してからの時間を計ります
 	double m_shotTimer = 0.0;
 
-	//射撃の強化モードです
+	//強化状態のときtrue
 	bool m_enhancedMode = false;
+
+	//シールドで吸収した強化値です
+	double m_enhancePoint = 0;
+
+	//m_enhancePointがこの値を超えると強化状態
+	double m_enhanceThreshold = 30;
+
+	//m_enhancePointがこの値を超えるとシールド全回復
+	double m_shieldRestoreThreshold = 50;
+
+	//m_enhancePointがshieldRestoreThresholdを超えた回数
+	int32 m_shieldRestoreCnt = 0;
+
+	//プレイヤー強化時のエフェクトです
+	Anime m_enhanceEffectAnime{ Point(4,1), TextureAsset(U"enhancedEffectTex"), 3, 5, 0.04, 0.5 };
 
 	//強化モード時の射撃間隔(秒)です
 	double m_enhancedShotCoolTime = 0.15;
@@ -272,21 +337,21 @@ private:
 	bool m_shieldFlag = false;
 
 	//シールドの最大耐久値です
-	double  m_maxShieldHP = 200.0;
+	double  m_maxShieldHP = 1000.0;
 
 	//シールドの現在の耐久値です
 	double m_shieldCurrentHP = m_maxShieldHP;
 
 	//毎秒自動回復する量です
-	static constexpr double m_shieldRegenerationRate = 5.0;
+	static constexpr double m_shieldRegenerationRate = 100.0;
 
 	//シールド使用時のアニメーションです
-	Anime m_shieldAnime{Point(4,1), TextureAsset(U"shieldTex"), 3, 5, 0.04, 0.5 };
+	Anime m_shieldAnime{TextureAsset(U"shieldTex"), 4, 5, 0.03, m_shieldSize * 0.18 };
 
 	//シールドの衝突範囲です
 	Circle m_shieldCollider{ m_shieldSize * 30.0 };
 
 	//アニメーションの位置と衝突範囲の調整用
-	Circular m_shieldAnimePosOffset{ 0,0 };
+	Circular m_shieldAnimePosOffset{ 3,0 };
 	
 };

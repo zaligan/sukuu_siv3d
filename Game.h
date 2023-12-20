@@ -19,6 +19,7 @@ public:
 
 private:
 
+	/// @brief ゲームの進行状況を表します
 	enum GameState
 	{
 		play,
@@ -26,41 +27,45 @@ private:
 		clear
 	};
 	GameState gameState = play;
+
+	/// @brief シーン開始時操作方法を表示します
 	bool showInstructionsFlag = true;
 
+	/// @brief 円形ステージ
 	static constexpr Circle earth{ 0, 0, earthR };
 
 	const Font font{ FontMethod::SDF,52,Typeface::Bold };
 
-	static constexpr double clearTime = 100.0;
+	/// @brief クリアまでの制限時間
+	static constexpr double clearTime = 80.0;
+
+	/// @brief 1フレームの時間
 	double deltaTime = 0.0;
+
+	/// @brief 操作説明を閉じてからの合計時間
 	double sceneTime = 0.0;
 
+	/// @brief プレイヤーの大きさ
 	static constexpr double playerSize = 1.3;
+
+	/// @brief プレイヤーを作成します
 	Player player{ playerSize };
 
+	/// @brief プレイヤーの弾を持つ配列
 	Array <Bullet> pBulletArr;
 
-	static constexpr double pBullet_speed = 400.0;
-
-	int arrNum = 0;
-
-	//効果音
-	const Audio gameBGM = AudioAsset(U"gameBGM");
-	const Audio pShotAud = AudioAsset(U"pShotAud");
-	const Texture backPic = TextureAsset(U"backPic");
-	const Texture pJetTex = TextureAsset(U"pJetTex");
-	const Texture shieldTex = TextureAsset(U"shieldTex");
-	const Texture eBullet_tex = TextureAsset(U"eBullet_tex");
-	const Texture enemy1_tex = TextureAsset(U"enemy1_tex");
-
-	//街
+	/// @brief 防衛対象の街が持つ情報です
 	struct Town
 	{
+		/// @brief 衝突範囲
 		Circle collider;
+		/// @brief 体力
 		HPBar hp;
 	};
-	int32 townHP = 1000;
+
+	/// @brief 街の最大体力
+	int32 townHP = 3000;
+
 	Array <Town> townArr =
 	{
 		Town{Circle{Arg::center(0,-earthR),houseSize},HPBar{townHP}},
@@ -69,6 +74,7 @@ private:
 		Town{Circle{Arg::center(earthR,0),houseSize},HPBar{townHP}},
 	};
 
+	/// @brief 衝突範囲とテクスチャを合わせるオフセット値です
 	static constexpr Circular townPosOffset{ 30,0 };
 	
 
@@ -91,7 +97,7 @@ private:
 	static constexpr double spawnIntervalSeconds = 1.0;
 
 	//spawnIntervalSecondsごとに出現させる敵の数です
-	static constexpr int32 spawnCnt = 1;
+	static constexpr int32 spawnCnt = 2;
 
 	//敵のスポーン時間を管理します
 	double eSpawnTimer = 0;

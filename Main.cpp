@@ -21,7 +21,7 @@ void Main()
 	App manager;
 
 	//調整用無敵モード、通常プレイ時はコメントアウト
-	manager.get()->testMode = true;
+	//manager.get()->testMode = true;
 
 	//Asset登録
 	TextReader reader{ U"asset-list.txt" };
@@ -76,7 +76,7 @@ void Main()
 	manager.add<Game>(State::Game);
 
 	//Gameシーンから開始する場合このコメントを外す
-	manager.init(State::Game);
+	//manager.init(State::Game);
 
 	//メインループ
 	while (System::Update())

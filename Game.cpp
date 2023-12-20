@@ -17,16 +17,6 @@ void Game::update()
 	{
 		return;
 	}
-	gameBGM.play();
-
-	if(showInstructionsFlag)
-	{
-		if (KeyJ.pressed())
-		{
-			showInstructionsFlag = false;
-		}
-		return;
-	}
 
 	//ゲームの状態遷移
 	switch (gameState)
@@ -50,6 +40,17 @@ void Game::update()
 
 	default:
 		break;
+	}
+
+	AudioAsset(U"gameBGM").play();
+
+	if(showInstructionsFlag)
+	{
+		if (KeyJ.pressed())
+		{
+			showInstructionsFlag = false;
+		}
+		return;
 	}
 
 	//時間管理
@@ -94,10 +95,6 @@ void Game::update()
 		player.shot(pBulletArr);
 	}
 	
-	
-
-	player.enhancedPlayer(KeyH.pressed());
-
 
 	//弾の更新
 	for (auto bulletIter = pBulletArr.begin(); bulletIter != pBulletArr.end();)
@@ -159,13 +156,14 @@ void Game::update()
 	//e弾VS Shield
 	if (player.isShieldAvailable())
 	{
-		player.shieldUpdate();
 		for (auto it = eBulletArr.begin(); it != eBulletArr.end();)
 		{
 			if (it->collider.intersects(player.getShieldCollider()))
 			{
 				player.shieldDamage(eBulletDamage);
+				player.addEnhancePoint(eBulletDamage / 10);
 				it = eBulletArr.erase(it);
+
 				continue;
 			}
 			it++;
@@ -339,7 +337,7 @@ void Game::draw() const
 		const auto t0 = camera.createTransformer();
 		const Transformer2D t1{ mat,TransformCursor::Yes };
 
-		backPic.scaled(1.0).drawAt(0, 0);
+		TextureAsset(U"backPic").scaled(1.0).drawAt(0, 0);
 		//ステージ
 		earth.draw(Palette::Saddlebrown);
 		for (int i = 0; i < 100; i++)
@@ -355,12 +353,7 @@ void Game::draw() const
 		}
 
 		//プレイヤー
-		pJetTex.scaled(playerSize).rotated(player.getTheta()).drawAt(player.getCenter());
-		if (player.isShieldAvailable())
-		{
-			player.shieldDraw(player.getCircular());
-		}
-
+		player.draw();
 
 		//p弾
 		for (auto& bullet : pBulletArr)
@@ -385,7 +378,7 @@ void Game::draw() const
 		//敵弾
 		for (auto& eBullet : eBulletArr)
 		{
-			eBullet_tex.drawAt(eBullet.collider.center);
+			TextureAsset(U"eBullet_tex").drawAt(eBullet.collider.center);
 		}
 		//アイテム
 		for (auto& item : itemArr)
@@ -418,34 +411,34 @@ void Game::draw() const
 	}
 
 	//残り時間
-	FontAsset(U"townHPFont")(U"{:.0f}"_fmt( clearTime - sceneTime)).drawAt(80,Scene::Center().x, 80);
+	FontAsset(U"townHPFont")(U"{:.0f}"_fmt(Max(0.0, clearTime - sceneTime) )).drawAt(80,Scene::Center().x, 80);
 
 	//街のHP
-	double interval = 75;
+	double interval = 180;
 	Array<String> townNameArr = { U"普通の街 HP",U"攻撃の街 HP" ,U"防御の街 HP" ,U"特殊の街 HP" };
 	for (int i = 0; i < townArr.size(); i++)
 	{
-		RoundRect{ 10,(i * interval) + 15,180,60,10 }.draw(ColorF{ 1.0,0.4 });
-		FontAsset(U"townHPFont")(townNameArr.at(i)).drawAt(100, (i * interval) + 60);
+		RoundRect{ i*interval + 600,1020,180,60,10 }.draw(Palette::Gray);
+		FontAsset(U"townHPFont")(townNameArr.at(i)).drawAt(i * interval + 690, 1030);
 	}
 	for (size_t i = 0; i < townArr.size(); i++)
 	{
-		const double x = 0;
-		const double y = interval * i;
-		const RectF rect = RectF{ x, y, 150, 16 }.movedBy(25, 30);
+		const double x = interval * i;
+		const double y = 0;
+		const RectF rect = RectF{ x, y, 150, 16 }.movedBy(615, 1050);
 		townArr.at(i).hp.draw(rect);
 	}
 
 	//プレイヤー強化
 	for (auto i : step(pUpgrade.size()))
 	{
-		Rect{ 810 + 100 * i,1020,100,60 }.draw(Palette::Darkgray);
-		Rect{ 810 + 100 * i,1020,100,60 }.drawFrame(5, Palette::Black);
-		FontAsset(U"townHPFont")(pUpgrade.at(i)).drawAt(860 + 100 * i, 1050, Palette::Blue);
+		Rect{ 810 + 100 * i,950,100,60 }.draw(Palette::Darkgray);
+		Rect{ 810 + 100 * i,950,100,60 }.drawFrame(5, Palette::Black);
+		FontAsset(U"townHPFont")(pUpgrade.at(i)).drawAt(860 + 100 * i, 980, Palette::Blue);
 	}
-	TextureAsset(U"Attack_Item").scaled(0.05).drawAt(830, 1050);
-	TextureAsset(U"Protect_Item").scaled(0.05).drawAt(930, 1050);
-	TextureAsset(U"Special_Item").scaled(0.05).drawAt(1030, 1050);
+	TextureAsset(U"Attack_Item").scaled(0.05).drawAt(830, 980);
+	TextureAsset(U"Protect_Item").scaled(0.05).drawAt(930, 980);
+	TextureAsset(U"Special_Item").scaled(0.05).drawAt(1030, 980);
 
 	//GameOver
 	switch (gameState)
