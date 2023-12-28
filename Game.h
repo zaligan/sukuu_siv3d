@@ -28,8 +28,18 @@ private:
 	};
 	GameState gameState = play;
 
-	/// @brief シーン開始時操作方法を表示します
+	/// @brief シーン開始時,操作方法を表示します
 	bool showInstructionsFlag = true;
+
+	/// @brief 操作の入力方法です
+	InputGroup rightInput = (KeyD | KeyRight);
+	InputGroup leftInput = (KeyA | KeyLeft);
+	InputGroup upInput = (KeyW | KeyUp);
+	InputGroup downInput = (KeyS | KeyDown);
+	InputGroup shotInput = (KeyJ | XInput(0).buttonA);
+	InputGroup shieldInput = (KeyK | XInput(0).buttonB);
+	//移動方向ベクトル
+	Vec2 moveInput = { 0,0 };
 
 	/// @brief 円形ステージ
 	static constexpr Circle earth{ 0, 0, earthR };
@@ -37,7 +47,7 @@ private:
 	const Font font{ FontMethod::SDF,52,Typeface::Bold };
 
 	/// @brief クリアまでの制限時間
-	static constexpr double clearTime = 80.0;
+	static constexpr double clearTime = 110.0;
 
 	/// @brief 1フレームの時間
 	double deltaTime = 0.0;
@@ -94,10 +104,14 @@ private:
 	Array <Bullet> eBulletArr;
 
 	//敵をスポーンさせる時間間隔です
-	static constexpr double spawnIntervalSeconds = 1.0;
+	static constexpr double spawnIntervalSeconds = 3.0;
 
 	//spawnIntervalSecondsごとに出現させる敵の数です
-	static constexpr int32 spawnCnt = 2;
+	int32 enemySpawnCalc(double currentTime)
+	{
+		return sceneTime /10 * baseSpawnNum;
+	}
+	static constexpr int32 baseSpawnNum = 1;
 
 	//敵のスポーン時間を管理します
 	double eSpawnTimer = 0;

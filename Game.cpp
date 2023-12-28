@@ -25,14 +25,14 @@ void Game::update()
 		break;
 
 	case Game::gameOver:
-		if (KeyJ.down())
+		if (shotInput.down())
 		{
 			changeScene(State::Title);
 		}
 		return;
 
 	case Game::clear:
-		if (KeyJ.down())
+		if (shotInput.down())
 		{
 			changeScene(State::Title);
 		}
@@ -46,7 +46,7 @@ void Game::update()
 
 	if(showInstructionsFlag)
 	{
-		if (KeyJ.pressed())
+		if (shotInput.pressed())
 		{
 			showInstructionsFlag = false;
 		}
@@ -57,10 +57,10 @@ void Game::update()
 	deltaTime = Scene::DeltaTime();
 	sceneTime += deltaTime;
 
-	if (sceneTime > clearTime)
+	/*if (sceneTime > clearTime)
 	{
 		gameState = clear;
-	}
+	}*/
 
 	if (player.getHP() <= 0)
 	{
@@ -68,29 +68,35 @@ void Game::update()
 	}
 
 	//-------プレイヤー-------
-	//p操作受付
+	//操作入力
+	moveInput = { 0,0 };
+	if (rightInput.pressed())
+	{
+		moveInput.x += 1.0;
+	}
+	if (leftInput.pressed())
+	{
+		moveInput.x -= 1.0;
+	}
+	if (upInput.pressed())
+	{
+		moveInput.y += 1.0;
+	}
+	if (downInput.pressed())
+	{
+		moveInput.y += -1.0;
+	}
+	moveInput.x += XInput(0).leftThumbX;
+	moveInput.y += XInput(0).leftThumbY;
+	
+	moveInput = Vec2{ Clamp(moveInput.x ,-1.0,1.0) ,Clamp(moveInput.y ,-1.0,1.0) };
+	player.move(moveInput);
 	player.update(deltaTime);
 
-	if (KeyA.pressed() || KeyLeft.pressed())
-	{
-		player.move(Directions::Left);
-	}
-	if (KeyD.pressed() || KeyRight.pressed())
-	{
-		player.move(Directions::Right);
-	}
-	if (KeyW.pressed() || KeyUp.pressed())
-	{
-		player.move(Directions::Up);
-	}
-	if (KeyS.pressed() || KeyDown.pressed())
-	{
-		player.move(Directions::Down);
-	}
 	//攻撃orシールド展開
-	player.useShield(KeyK.pressed());
+	player.useShield(shieldInput.pressed());
 
-	if (KeyJ.pressed() && !KeyK.pressed())
+	if (shotInput.pressed() && !shieldInput.pressed())
 	{
 		player.shot(pBulletArr);
 	}
@@ -101,6 +107,7 @@ void Game::update()
 	{
 		//移動
 		Vec2 update(bulletIter->direction * pBullet_speed  * deltaTime);
+		Line trajectory{ bulletIter->collider.center,bulletIter->collider.center + update };
 		bulletIter->collider.setCenter(bulletIter->collider.center + update);
 
 		//弾自身が範囲外なら削除
@@ -114,7 +121,7 @@ void Game::update()
 		bool isHit = false;
 		for (auto enemyIter = eArr.begin(); enemyIter != eArr.end();)
 		{
-			if (bulletIter->collider.intersects(enemyIter->getCollider()))
+			if (Geometry2D::Distance(trajectory, enemyIter->getCenter()) < bulletIter->collider.r + enemyIter->getCollider().r)
 			{
 				switch (bulletIter->type)
 				{
@@ -196,7 +203,7 @@ void Game::update()
 	if (eSpawnTimer > spawnIntervalSeconds)
 	{
 		eSpawnTimer -= spawnIntervalSeconds;
-		for(int i:step(spawnCnt))
+		for(int i:step(enemySpawnCalc(sceneTime)))
 		{
 			const double r = Random(minSpawnR,maxSpawnR );
 			const double theta = Math::ToRadians(Random(minSpawnTheta, maxSpawnTheta));
@@ -204,9 +211,9 @@ void Game::update()
 		}
 	}
 
-	//TODO:CSVファイルが1行の時のエラー対応
+	//TODO:CSVファイルが1行の時エラー,sceneTimeが100以上の時エラー
 	//CSVスポーン １行目は項目のためスルー
-	while (index + 2 <= enemyCSV.rows())
+	/*while (index + 2 <= enemyCSV.rows())
 	{
 		if (Parse<int32>(enemyCSV[index + 1][0]) < sceneTime)
 		{
@@ -219,7 +226,7 @@ void Game::update()
 		{
 			break;
 		}
-	}
+	}*/
 
 	//e本体処理
 	for (auto it = eArr.begin(); it != eArr.end();)

@@ -32,9 +32,9 @@ struct Bullet
 
 /// @brief プレイヤーの弾速
 static constexpr double pBullet_speed = 400.0;
-constexpr double pBulletR = 4.0;
+constexpr double pBulletR = 6.0;
 constexpr double pBulletDamage = 10.0;
-constexpr double pEnhancedBulletR = 8.0;
+constexpr double pEnhancedBulletR = 9.0;
 constexpr double pEnhancedBulletDamage = 20.0;
 
 

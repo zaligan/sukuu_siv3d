@@ -31,7 +31,7 @@ public:
 
 	/// @brief 体力を計算します
 	/// @param damage 受けるダメージです
-	/// @return 体力が0以下の時true
+	/// @return 体力が0以下の時,true
 	bool damage(double damage);
 
 	/// @brief 現在の体力を返します
@@ -41,11 +41,11 @@ public:
 	/// @brief 弾を発射します
 	/// @param eBulletArr 敵のBulletを管理する配列です
 	/// @param pJetPos プレイヤーの座標です
-	/// @return 弾を発射したらtureを返します
+	/// @return 弾を発射したら,tureを返します
 	bool shot(Array<Bullet>& eBulletArr, const Vec2& pJetPos);
 
 	/// @brief 敵の生死を返します
-	/// @return 敵が死んでいる時true
+	/// @return 敵が死んでいる時,true
 	bool isDeath() const;
 
 	/// @brief 衝突判定のためのCircleを返します。
@@ -58,7 +58,7 @@ public:
 
 	/// @brief 衝突した弾が初めての衝突か確認して、初めての場合IDをArrayに追加します
 	/// @param bulletID 衝突した弾のIDです
-	/// @return 衝突したことのある弾だった場合trueを返します
+	/// @return 衝突したことのある弾だった場合,trueを返します
 	bool isHitThisBullet(int32 bulletID);
 
 private:
@@ -93,7 +93,7 @@ private:
 	/// @brief 敵が街に近づけない範囲です
 	static constexpr double m_enemyHouseRange = enemyHouseRange;
 
-	/// @brief 自身の体力が０以下の時trueとなります
+	/// @brief 自身の体力が０以下の時,trueとなります
 	bool m_deathFlag = false;
 
 	/// @brief 破壊された時のアニメーションです

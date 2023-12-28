@@ -4,15 +4,6 @@
 #include "Bullet.hpp"
 #include "StageInfo.hpp"
 
-//移動方向を表す列挙型
-enum class Directions
-{
-	Up,
-	Down,
-	Left,
-	Right
-};
-
 class Player
 {
 public:
@@ -68,27 +59,16 @@ public:
 
 	/// @brief 入力に応じてプレイヤーを移動します
 	/// @param directions 入力されている方向を表すパラメータです
-	void move( Directions directions)
+	void move( double moveInput_X,double moveInput_Y)
 	{
-		switch (directions)
-		{
-		case Directions::Up:
-			m_pos.r += m_vertSpeed* m_deltaTime;
-			break;
-
-		case Directions::Down:
-			m_pos.r -= m_vertSpeed * m_deltaTime;
-			break;
-
-		case Directions::Left:
-			m_pos.theta -= 2 * Math::Pi * m_deltaTime / (m_maxRotatSpeed + ((m_minRotatSpeed - m_maxRotatSpeed) * ((getR() - m_moveRange.minRadius) / (m_moveRange.maxRadius - m_moveRange.minRadius))));
-			break;
-
-		case Directions::Right:
-			m_pos.theta += 2 * Math::Pi * m_deltaTime / (m_maxRotatSpeed + ((m_minRotatSpeed - m_maxRotatSpeed) * ((getR() - m_moveRange.minRadius) / (m_moveRange.maxRadius - m_moveRange.minRadius))));
-			break;
-		}
+		m_pos.r += m_vertSpeed * m_deltaTime * moveInput_Y;
+		m_pos.theta += 2 * Math::Pi * m_deltaTime / (m_maxRotateSpeed + ((m_minRotateSpeed - m_maxRotateSpeed) * ((getR() - m_moveRange.minRadius) / (m_moveRange.maxRadius - m_moveRange.minRadius)))) * moveInput_X;
 		m_pos.r = Clamp(m_pos.r, m_moveRange.minRadius, m_moveRange.maxRadius);
+	}
+
+	void move(Vec2 moveInput)
+	{
+		move(moveInput.x, moveInput.y);
 	}
 
 	/// @brief プレイヤーを描画します
@@ -287,10 +267,10 @@ private:
 	static constexpr double m_vertSpeed = 200.0;
 
 	//左右方向の移動速度です,MoveRangeによって変化
-	//プレイヤーがminRadiusにいる時１周にかかる秒数
-	static constexpr double m_maxRotatSpeed = 6.0;
-	//プレイヤーがmaxRadiusにいる時１周にかかる秒数
-	static constexpr double m_minRotatSpeed = 18.0;
+	//プレイヤーが,minRadiusにいる時１周にかかる秒数
+	static constexpr double m_maxRotateSpeed = 3.0;
+	//プレイヤーが,maxRadiusにいる時１周にかかる秒数
+	static constexpr double m_minRotateSpeed = 18.0;
 
 	//プレイヤーの最大体力です
 	static constexpr double m_maxHP = 1.0;
@@ -304,7 +284,7 @@ private:
 	//射撃してからの時間を計ります
 	double m_shotTimer = 0.0;
 
-	//強化状態のときtrue
+	//強化状態のとき,true
 	bool m_enhancedMode = false;
 
 	//シールドで吸収した強化値です
@@ -316,7 +296,7 @@ private:
 	//m_enhancePointがこの値を超えるとシールド全回復
 	double m_shieldRestoreThreshold = 50;
 
-	//m_enhancePointがshieldRestoreThresholdを超えた回数
+	//m_enhancePointが,shieldRestoreThresholdを超えた回数
 	int32 m_shieldRestoreCnt = 0;
 
 	//プレイヤー強化時のエフェクトです
