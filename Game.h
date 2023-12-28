@@ -109,7 +109,8 @@ private:
 	//spawnIntervalSecondsごとに出現させる敵の数です
 	int32 enemySpawnCalc(double currentTime)
 	{
-		return sceneTime /10 * baseSpawnNum;
+		//return sceneTime /10 * baseSpawnNum;
+		return 10;
 	}
 	static constexpr int32 baseSpawnNum = 1;
 
