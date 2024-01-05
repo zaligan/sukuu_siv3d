@@ -106,7 +106,7 @@ void Game::update()
 	for (auto bulletIter = pBulletArr.begin(); bulletIter != pBulletArr.end();)
 	{
 		//移動
-		Vec2 update(bulletIter->direction * pBullet_speed  * deltaTime);
+		Vec2 update(bulletIter->direction * pBullet_speed * deltaTime);
 		Line trajectory{ bulletIter->collider.center,bulletIter->collider.center + update };
 		bulletIter->collider.setCenter(bulletIter->collider.center + update);
 
@@ -121,13 +121,14 @@ void Game::update()
 		bool isHit = false;
 		for (auto enemyIter = eArr.begin(); enemyIter != eArr.end();)
 		{
-			if (Geometry2D::Distance(trajectory, enemyIter->getCenter()) < bulletIter->collider.r + enemyIter->getCollider().r)
+			if ((Geometry2D::Distance(trajectory, enemyIter->getCenter()) < bulletIter->collider.r + enemyIter->getCollider().r) && enemyIter->getHP() > 0)
 			{
 				switch (bulletIter->type)
 				{
 				case Normal:
 					enemyIter->damage(pBulletDamage);
-					bulletIter = pBulletArr.erase(bulletIter);					
+					bulletIter = pBulletArr.erase(bulletIter);
+					isHit = true;
 					break;
 
 				case Enhanced:
@@ -135,19 +136,16 @@ void Game::update()
 					{
 						enemyIter->damage(pEnhancedBulletDamage);
 					}
-					bulletIter++;
 					break;
 
 				default:
 					break;
 				}
-
-				isHit = true;
-				break;
 			}
-			else
+			enemyIter++;
+			if (isHit)
 			{
-				enemyIter++;
+				break;
 			}
 		}
 		if (!isHit)

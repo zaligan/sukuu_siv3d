@@ -41,7 +41,7 @@ public:
 	/// @brief 弾を発射します
 	/// @param eBulletArr 敵のBulletを管理する配列です
 	/// @param pJetPos プレイヤーの座標です
-	/// @return 弾を発射したら,tureを返します
+	/// @return 弾を発射したら,trueを返します
 	bool shot(Array<Bullet>& eBulletArr, const Vec2& pJetPos);
 
 	/// @brief 敵の生死を返します
@@ -91,7 +91,7 @@ private:
 	int32 m_shotCnt = 0;
 
 	/// @brief 敵が街に近づけない範囲です
-	static constexpr double m_enemyHouseRange = enemyHouseRange;
+	static constexpr double m_enemyHouseRange = StageInfo::enemyHouseRange;
 
 	/// @brief 自身の体力が０以下の時,trueとなります
 	bool m_deathFlag = false;

@@ -247,7 +247,7 @@ private:
 	double m_deltaTime = 0;
 
 	//プレイヤーの中心座標(半径、回転角)です
-	Circular m_pos{ earthR,0 };
+	Circular m_pos{ StageInfo::earthR,0 };
 
 	//プレイヤーのサイズです
 	double m_playerSize = 1.0;
@@ -261,7 +261,7 @@ private:
 		double minRadius;
 		double maxRadius;
 	};
-	static constexpr MoveRange m_moveRange{ 100,earthR + 200 };
+	static constexpr MoveRange m_moveRange{ 100,StageInfo::earthR + 200 };
 
 	//上下方向の移動速度です
 	static constexpr double m_vertSpeed = 200.0;

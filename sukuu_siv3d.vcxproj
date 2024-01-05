@@ -363,6 +363,8 @@
     <ClInclude Include="StageInfo.hpp" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="Title.h" />
+    <ClInclude Include="Town.hpp" />
+    <ClInclude Include="Upgrade.hpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App\example\obj\blacksmith.obj">

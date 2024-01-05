@@ -5,6 +5,7 @@
 #include"HPBar.h"
 #include"Player.hpp"
 #include"StageInfo.hpp"
+#include"Town.hpp"
 
 // ゲームシーン
 class Game : public App::Scene
@@ -42,7 +43,7 @@ private:
 	Vec2 moveInput = { 0,0 };
 
 	/// @brief 円形ステージ
-	static constexpr Circle earth{ 0, 0, earthR };
+	static constexpr Circle earth{ 0, 0, StageInfo::earthR };
 
 	const Font font{ FontMethod::SDF,52,Typeface::Bold };
 
@@ -73,20 +74,19 @@ private:
 		HPBar hp;
 	};
 
-	/// @brief 街の最大体力
+	// @brief 街の最大体力
 	int32 townHP = 3000;
 
 	Array <Town> townArr =
 	{
-		Town{Circle{Arg::center(0,-earthR),houseSize},HPBar{townHP}},
-		Town{Circle{Arg::center(-earthR,0),houseSize},HPBar{townHP}},
-		Town{Circle{Arg::center(0,earthR),houseSize},HPBar{townHP}},
-		Town{Circle{Arg::center(earthR,0),houseSize},HPBar{townHP}},
+		Town{Circle{Arg::center(0,-StageInfo::earthR),StageInfo::townSize},HPBar{townHP}},
+		Town{Circle{Arg::center(-StageInfo::earthR,0),StageInfo::townSize},HPBar{townHP}},
+		Town{Circle{Arg::center(0,StageInfo::earthR),StageInfo::townSize},HPBar{townHP}},
+		Town{Circle{Arg::center(StageInfo::earthR,0),StageInfo::townSize},HPBar{townHP}},
 	};
 
 	/// @brief 衝突範囲とテクスチャを合わせるオフセット値です
 	static constexpr Circular townPosOffset{ 30,0 };
-	
 
 	//アップグレード
 	Array <int> pUpgrade = { 0,0,0 };
@@ -109,8 +109,7 @@ private:
 	//spawnIntervalSecondsごとに出現させる敵の数です
 	int32 enemySpawnCalc(double currentTime)
 	{
-		//return sceneTime /10 * baseSpawnNum;
-		return 10;
+		return sceneTime /10 * baseSpawnNum;
 	}
 	static constexpr int32 baseSpawnNum = 1;
 

@@ -21,7 +21,7 @@ void Main()
 	App manager;
 
 	//調整用無敵モード、通常プレイ時はコメントアウト
-	manager.get()->testMode = true;
+	//manager.get()->testMode = true;
 
 	//Asset登録
 	TextReader reader{ U"asset-list.txt" };
