@@ -11,7 +11,10 @@ enum BulletType
 	Enhanced,
 
 	//敵の弾
-	EnemyBullet
+	EnemyBullet,
+
+	//街の弾
+	TownBullet
 };
 
 //敵とプレイヤーの弾のクラスです
@@ -28,17 +31,16 @@ struct Bullet
 
 	// 進行方向を表す単位ベクトルです
 	Vec2 direction;
+
+	//この弾のダメージです
+	double damage;
 };
 
 /// @brief プレイヤーの弾速
 static constexpr double pBullet_speed = 400.0;
 constexpr double pBulletR = 6.0;
-constexpr double pBulletDamage = 10.0;
 constexpr double pEnhancedBulletR = 9.0;
-constexpr double pEnhancedBulletDamage = 20.0;
-
-
 
 constexpr double eBulletR = 4.0;
 constexpr double eBulletSpeed = 40.0;
-constexpr double eBulletDamage = 10.0;
+

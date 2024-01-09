@@ -357,11 +357,13 @@
     <ClInclude Include="Bullet.hpp" />
     <ClInclude Include="Common.h" />
     <ClInclude Include="Enemy.h" />
+    <ClInclude Include="Figure.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="HPBar.h" />
     <ClInclude Include="Player.hpp" />
     <ClInclude Include="StageInfo.hpp" />
     <ClInclude Include="stdafx.h" />
+    <ClInclude Include="TexturedCollider.hpp" />
     <ClInclude Include="Title.h" />
     <ClInclude Include="Town.hpp" />
     <ClInclude Include="Upgrade.hpp" />

@@ -84,6 +84,9 @@ private:
 	/// @brief スポーンしてからの時間を計ります
 	Stopwatch stopwatch{ StartImmediately::Yes };
 
+	/// @brief 攻撃力です
+	static constexpr double m_bulletDamage = 10.0;
+
 	/// @brief 攻撃間隔(秒)です
 	static constexpr double m_eShotCoolTime = 3.0;
 

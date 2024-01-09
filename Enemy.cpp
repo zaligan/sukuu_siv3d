@@ -58,33 +58,28 @@ bool Enemy::shot(Array<Bullet>& eBulletArr, const Vec2& pJetPos)
 	{
 		m_shotCnt++;
 
+		//プレイヤーまでのベクトル
 		const Vec2 directPJet = pJetPos - getCenter();
+		//街までのベクトル
 		const Vec2 directTown = OffsetCircular({ 0,0 }, StageInfo::earthR, ((static_cast<int>((m_pos.theta + (Math::HalfPi / 2)) / Math::HalfPi) % 4) * Math::HalfPi)) - getCollider().center;
-
+		//
+		Vec2 direction = {0,0};
 		//プレイヤーと街の近いほうを狙う
 		if (directTown.lengthSq() < directPJet.lengthSq())
 		{
-			Vec2 direction = directTown.normalized();
-
-			if (direction.isZero())
-			{
-				direction = Vec2{ 0,1 };
-			}
-
-			eBulletArr << Bullet{ EnemyBullet,0,Circle{Arg::center(getCenter()),eBulletR}, direction };
+			direction = directTown.normalized();
 		}
 		else
 		{
-			Vec2 direction = directPJet.normalized();
-
-			if (direction.isZero())
-			{
-				direction = Vec2{ 0,1 };
-			}
-
-			eBulletArr << Bullet{ EnemyBullet,0, Circle{Arg::center(getCenter()),eBulletR}, directPJet.normalized() };
+			direction = directPJet.normalized();
+		}
+		if (direction.isZero())
+		{
+			direction = Vec2{ 0,1 };
 		}
 
+		eBulletArr << Bullet{ EnemyBullet,0, Circle{Arg::center(getCenter()),eBulletR},direction ,m_bulletDamage };
+//----------------------------
 		return true;
 	}
 	return false;

@@ -65,24 +65,12 @@ private:
 	/// @brief プレイヤーの弾を持つ配列
 	Array <Bullet> pBulletArr;
 
-	/// @brief 防衛対象の街が持つ情報です
-	struct Town
-	{
-		/// @brief 衝突範囲
-		Circle collider;
-		/// @brief 体力
-		HPBar hp;
-	};
-
-	// @brief 街の最大体力
-	int32 townHP = 3000;
-
 	Array <Town> townArr =
 	{
-		Town{Circle{Arg::center(0,-StageInfo::earthR),StageInfo::townSize},HPBar{townHP}},
-		Town{Circle{Arg::center(-StageInfo::earthR,0),StageInfo::townSize},HPBar{townHP}},
-		Town{Circle{Arg::center(0,StageInfo::earthR),StageInfo::townSize},HPBar{townHP}},
-		Town{Circle{Arg::center(StageInfo::earthR,0),StageInfo::townSize},HPBar{townHP}},
+		Town{TownType::Nomal,Circular{StageInfo::earthR,0}},
+		Town{TownType::Nomal,Circular{StageInfo::earthR,90_deg}},
+		Town{TownType::Nomal,Circular{StageInfo::earthR,180_deg}},
+		Town{TownType::Nomal,Circular{StageInfo::earthR,270_deg}}
 	};
 
 	/// @brief 衝突範囲とテクスチャを合わせるオフセット値です

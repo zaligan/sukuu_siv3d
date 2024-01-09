@@ -98,11 +98,11 @@ public:
 
 				Vec2 direction = Vec2(Circular{ 1,getTheta() }).normalized();
 
-				bulletArr << Bullet{ Enhanced,m_enhancedBulletID,Circle{getCenter(),pEnhancedBulletR}, direction };
+				bulletArr << Bullet{ Enhanced,m_enhancedBulletID,Circle{getCenter(),pEnhancedBulletR}, direction ,m_enhancedBulletDamage };
 
 				m_enhancedBulletID++;
 
-				m_enhancePoint = Max(m_enhancePoint- eBulletDamage,0.0);
+				m_enhancePoint = Max(m_enhancePoint- m_shotLostEnhancePoint,0.0);
 
 				AudioAsset(U"pShotAud").playOneShot();
 			}
@@ -116,7 +116,7 @@ public:
 
 				Vec2 direction = Vec2(Circular{ 1,getTheta() }).normalized();
 
-				bulletArr << Bullet{ Normal,0,Circle{getCenter(),pBulletR}, direction };
+				bulletArr << Bullet{ Normal,0,Circle{getCenter(),pBulletR}, direction ,m_bulletDamage };
 
 				AudioAsset(U"pShotAud").playOneShot();
 			}
@@ -284,6 +284,8 @@ private:
 	//射撃してからの時間を計ります
 	double m_shotTimer = 0.0;
 
+//-------強化状態--------------------------
+
 	//強化状態のとき,true
 	bool m_enhancedMode = false;
 
@@ -299,11 +301,22 @@ private:
 	//m_enhancePointが,shieldRestoreThresholdを超えた回数
 	int32 m_shieldRestoreCnt = 0;
 
+	//強化状態で発射した時に減るm_enhancePointの量
+	static constexpr double m_shotLostEnhancePoint = 10.0;
+
 	//プレイヤー強化時のエフェクトです
 	Anime m_enhanceEffectAnime{ Point(4,1), TextureAsset(U"enhancedEffectTex"), 3, 5, 0.04, 0.5 };
 
 	//強化モード時の射撃間隔(秒)です
 	double m_enhancedShotCoolTime = 0.15;
+
+//-------弾--------------------
+
+	//通常時の弾の威力
+	static constexpr double m_bulletDamage = 10.0;
+
+	//強化時の弾の威力
+	static constexpr double m_enhancedBulletDamage = 20.0;
 
 	//強化した弾のIDです
 	int32 m_enhancedBulletID = 0;

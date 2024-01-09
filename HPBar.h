@@ -1,5 +1,5 @@
 ﻿//引用元：https://github.com/Siv3D/Siv3D-Samples/tree/main/Samples/HPBar
-
+#pragma once
 # include <Siv3D.hpp> // OpenSiv3D v0.6.5
 
 /// @brief HP バー

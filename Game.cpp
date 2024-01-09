@@ -13,6 +13,7 @@ Game::Game(const InitData& init)
 
 void Game::update()
 {
+	//一時停止用
 	if (KeyP.pressed())
 	{
 		return;
@@ -42,8 +43,10 @@ void Game::update()
 		break;
 	}
 
+	//BGM再生
 	AudioAsset(U"gameBGM").play();
 
+	//ゲームシーンになった時、操作方法を表示
 	if(showInstructionsFlag)
 	{
 		if (shotInput.pressed())
@@ -57,11 +60,11 @@ void Game::update()
 	deltaTime = Scene::DeltaTime();
 	sceneTime += deltaTime;
 
-	/*if (sceneTime > clearTime)
+	//状況に応じてゲームの状態を変更
+	if (sceneTime > clearTime)
 	{
 		gameState = clear;
-	}*/
-
+	}
 	if (player.getHP() <= 0)
 	{
 		gameState = gameOver;
@@ -111,7 +114,7 @@ void Game::update()
 		bulletIter->collider.setCenter(bulletIter->collider.center + update);
 
 		//弾自身が範囲外なら削除
-		if (bulletIter->collider.x < -bulletDeleteRange || bulletDeleteRange < bulletIter->collider.x || bulletIter->collider.y < -bulletDeleteRange || bulletIter->collider.y > bulletDeleteRange)
+		if (bulletIter->collider.x < -StageInfo::bulletDeleteRange || StageInfo::bulletDeleteRange < bulletIter->collider.x || bulletIter->collider.y < -StageInfo::bulletDeleteRange || bulletIter->collider.y > StageInfo::bulletDeleteRange)
 		{
 			bulletIter = pBulletArr.erase(bulletIter);
 			continue;
@@ -126,7 +129,7 @@ void Game::update()
 				switch (bulletIter->type)
 				{
 				case Normal:
-					enemyIter->damage(pBulletDamage);
+					enemyIter->damage(bulletIter->damage);
 					bulletIter = pBulletArr.erase(bulletIter);
 					isHit = true;
 					break;
@@ -134,8 +137,14 @@ void Game::update()
 				case Enhanced:
 					if (!enemyIter->isHitThisBullet(bulletIter->ID))
 					{
-						enemyIter->damage(pEnhancedBulletDamage);
+						enemyIter->damage(bulletIter->damage);
 					}
+					break;
+
+				case TownBullet:
+					enemyIter->damage(bulletIter->damage);
+					bulletIter = pBulletArr.erase(bulletIter);
+					isHit = true;
 					break;
 
 				default:
@@ -163,10 +172,10 @@ void Game::update()
 	{
 		for (auto it = eBulletArr.begin(); it != eBulletArr.end();)
 		{
-			if (it->collider.intersects(player.getShieldCollider()))
+			if (it->type == BulletType::EnemyBullet && it->collider.intersects(player.getShieldCollider()))
 			{
-				player.shieldDamage(eBulletDamage);
-				player.addEnhancePoint(eBulletDamage / 10);
+				player.shieldDamage(it->damage);
+				player.addEnhancePoint(it->damage / 10);
 				it = eBulletArr.erase(it);
 
 				continue;
@@ -179,7 +188,7 @@ void Game::update()
 	//-----Item処理------
 	for (auto it = itemArr.begin(); it != itemArr.end();)
 	{
-		if (it->pos.r > earthR)
+		if (it->pos.r > StageInfo::earthR)
 		{
 			it->pos.r -= itemSpeed * deltaTime;
 		}
@@ -259,7 +268,7 @@ void Game::update()
 		bool exsit = false;
 		for (auto i : step(townArr.size()))
 		{
-			if (it->collider.intersects(townArr.at(i).collider))
+			/*if (it->collider.intersects(townArr.at(i).collider))
 			{
 				if (!getData().testMode)
 				{
@@ -268,7 +277,7 @@ void Game::update()
 				it = eBulletArr.erase(it);
 				exsit = true;
 				break;
-			}
+			}*/
 		}
 		if (exsit)
 		{
@@ -279,7 +288,7 @@ void Game::update()
 		{
 			if (!getData().testMode)
 			{
-				player.damage(eBulletDamage);
+				player.damage(it->damage);
 			}
 			it = eBulletArr.erase(it);
 		}
@@ -297,20 +306,22 @@ void Game::update()
 		}
 	}
 	//範囲外の弾は削除
-	eBulletArr.remove_if([](const Bullet& b) {return (b.collider.x < -bulletDeleteRange) || (b.collider.x > bulletDeleteRange) || (b.collider.y < -bulletDeleteRange) || (b.collider.y > bulletDeleteRange); });
+	eBulletArr.remove_if([](const Bullet& b) {return (b.collider.x < -StageInfo::bulletDeleteRange) || (b.collider.x > StageInfo::bulletDeleteRange) || (b.collider.y < -StageInfo::bulletDeleteRange) || (b.collider.y > StageInfo::bulletDeleteRange); });
+
+	//town更新
+	for (size_t i = 0; i < townArr.size(); ++i)
+	{
+		townArr.at(i).update(deltaTime);
+		townArr[i].shot(pBulletArr);
+	}
 
 	//Town処理
 	for (auto& town : townArr)
 	{
-		if (town.hp.getHP() <= 0)
+		if (town.getHP() <= 0)
 		{
 			gameState = gameOver;
 		}
-	}
-	//HPBar
-	for (size_t i = 0; i < townArr.size(); ++i)
-	{
-		townArr.at(i).hp.update();
 	}
 
 	//カメラ計算
@@ -318,9 +329,9 @@ void Game::update()
 	camera.setTargetCenter(Circular{player.getR() + cameraOffsetY,0});
 	if (cameraMode)
 	{
-		if (player.getR()< earthR)
+		if (player.getR()< StageInfo::earthR)
 		{
-			camera.setTargetScale(cameraScale * (1 - 0.65 * ((earthR - player.getR()) / earthR)));
+			camera.setTargetScale(cameraScale * (1 - 0.65 * ((StageInfo::earthR - player.getR()) / StageInfo::earthR)));
 		}
 		else
 		{
@@ -348,13 +359,27 @@ void Game::draw() const
 		for (int i = 0; i < 100; i++)
 		{
 			double tileDeg = Math::Pi * 2 / 100 * i;
-			TextureAsset(U"earthTile").scaled(0.07).rotated(tileDeg).drawAt(OffsetCircular({ 0,0 }, earthR, tileDeg));
+			TextureAsset(U"earthTile").scaled(0.07).rotated(tileDeg).drawAt(OffsetCircular({ 0,0 }, StageInfo::earthR, tileDeg));
 		}
 
+		//街
 		for (int32 i:step(townArr.size()))
 		{
-			double townRotate = Math::ToRadians(i * 90);
-			TextureAsset(U"townTex").scaled(0.2).rotated(townRotate).drawAt(Circular(earthR + townPosOffset.r,townRotate + townPosOffset.theta));
+			double townRotate = Math::ToRadians(i * (360/townArr.size()));
+			switch (townArr[i].getTownType())
+			{
+			case TownType::Nomal:
+				TextureAsset(U"townTex").scaled(0.2).rotated(townRotate).drawAt(Circular(StageInfo::earthR + townPosOffset.r, townRotate + townPosOffset.theta));
+				break;
+			case TownType::Attack:
+				break;
+			case TownType::Defense:
+				break;
+			case TownType::Special:
+				break;
+			default:
+				break;
+			}
 		}
 
 		//プレイヤー
@@ -371,7 +396,11 @@ void Game::draw() const
 			case Enhanced:
 				TextureAsset(U"pEnhancedBullet_tex").rotated(player.getTheta()-90_deg).drawAt(bullet.collider.center);
 				break;
+			case TownBullet:
+				TextureAsset(U"pBullet_tex").rotated(player.getTheta()).drawAt(bullet.collider.center);
+				break;
 			default:
+				TextureAsset(U"townTex").rotated(player.getTheta()).drawAt(bullet.collider.center);
 				break;
 			}
 		}
@@ -431,7 +460,7 @@ void Game::draw() const
 		const double x = interval * i;
 		const double y = 0;
 		const RectF rect = RectF{ x, y, 150, 16 }.movedBy(615, 1050);
-		townArr.at(i).hp.draw(rect);
+		townArr.at(i).drawHPBar(rect);
 	}
 
 	//プレイヤー強化
