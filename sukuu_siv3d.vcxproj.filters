@@ -843,6 +843,9 @@
     <None Include="App\config.toml">
       <Filter>Resource Files</Filter>
     </None>
+    <None Include="App\script.as">
+      <Filter>Resource Files</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Media Include="App\example\test.mp3">
