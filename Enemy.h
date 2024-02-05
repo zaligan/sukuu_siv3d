@@ -64,7 +64,7 @@ public:
 private:
 
 	/// @brief 最大体力です
-	double m_maxHP = 20.0;
+	double m_maxHP = 10.0;
 
 	/// @brief 現在の体力です
 	double m_currentHP = m_maxHP;

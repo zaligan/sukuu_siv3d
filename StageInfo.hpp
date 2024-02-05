@@ -4,7 +4,7 @@
 namespace StageInfo
 {
 	//ステージの星の半径
-	constexpr int32 earthR = 400;
+	constexpr int32 earthR = 300;
 
 	//街の大きさ
 	constexpr double townSize = 60.0;
