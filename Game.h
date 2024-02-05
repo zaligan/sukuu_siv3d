@@ -76,11 +76,6 @@ private:
 	/// @brief 衝突範囲とテクスチャを合わせるオフセット値です
 	static constexpr Circular townPosOffset{ 30,0 };
 
-	//アップグレード
-	Array <int> pUpgrade = { 0,0,0 };
-	double shotSpeedRate = 0.94;//攻撃強化1ごとにかかる倍率
-	double shieldUpgRate = 15;//防御強化1ごとに加算する耐久値
-
 	//CSVファイル
 	const CSV enemyCSV{ U"csv/EnemyDataSheat.csv" };
 	size_t index = 0;
@@ -92,12 +87,12 @@ private:
 	Array <Bullet> eBulletArr;
 
 	//敵をスポーンさせる時間間隔です
-	static constexpr double spawnIntervalSeconds = 3.0;
+	static constexpr double spawnIntervalSeconds = 1.0;
 
 	//spawnIntervalSecondsごとに出現させる敵の数です
 	int32 enemySpawnCalc(double currentTime)
 	{
-		return sceneTime /10 * baseSpawnNum;
+		return 5;
 	}
 	static constexpr int32 baseSpawnNum = 1;
 

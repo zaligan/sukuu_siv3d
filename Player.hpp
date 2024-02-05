@@ -3,6 +3,7 @@
 #include "Anime.hpp"
 #include "Bullet.hpp"
 #include "StageInfo.hpp"
+#include "Upgrade.hpp"
 
 class Player
 {
@@ -224,7 +225,41 @@ public:
 	{
 		m_enhancePoint += addPoint;
 	}
-	
+
+	/// @brief アップグレードアイテムの所持数を加算
+	/// @param itemType アップグレードの種類
+	void addOnePointUpgrade(int32 itemType)
+	{
+		switch (itemType)
+		{
+		case 0:
+			m_upgrade.Attack++;
+			break;
+		case 1:
+			m_upgrade.Defense++;
+			break;
+		case 2:
+			m_upgrade.Special++;
+			break;
+		default:
+			break;
+		}
+	}
+
+	/// @brief 所持アップグレード数をすべて0にする
+	void resetUpgrade()
+	{
+		m_upgrade = { 0,0,0 };
+	}
+
+	/// @brief 所持アップグレード数を返します
+	/// @return 所持アップグレード数
+	Upgrade getUpgradeCnt() const
+	{
+		return m_upgrade;
+	}
+
+
 private:
 
 	/// @brief シールドを更新します
@@ -310,6 +345,8 @@ private:
 	//強化モード時の射撃間隔(秒)です
 	double m_enhancedShotCoolTime = 0.15;
 
+	//アップグレードアイテム
+	Upgrade m_upgrade;
 //-------弾--------------------
 
 	//通常時の弾の威力

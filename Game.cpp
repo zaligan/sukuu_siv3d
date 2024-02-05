@@ -4,7 +4,6 @@
 Game::Game(const InitData& init)
 	: IScene{ init }
 {
-	
 	if (not enemyCSV) // もし読み込みに失敗したら
 	{
 		throw Error{ U"Failed to load `EnemyDataSheat.csv`" };
@@ -47,7 +46,7 @@ void Game::update()
 	AudioAsset(U"gameBGM").play();
 
 	//ゲームシーンになった時、操作方法を表示
-	if(showInstructionsFlag)
+	if(showInstructionsFlag && !getData().testMode)
 	{
 		if (shotInput.pressed())
 		{
@@ -61,7 +60,7 @@ void Game::update()
 	sceneTime += deltaTime;
 
 	//状況に応じてゲームの状態を変更
-	if (sceneTime > clearTime)
+	if (sceneTime > clearTime && !getData().testMode)
 	{
 		gameState = clear;
 	}
@@ -70,7 +69,9 @@ void Game::update()
 		gameState = gameOver;
 	}
 
-	//-------プレイヤー-------
+
+	//----------------プレイヤー----------------
+
 	//操作入力
 	moveInput = { 0,0 };
 	if (rightInput.pressed())
@@ -163,9 +164,8 @@ void Game::update()
 		}
 	}
 
-	//----シールド処理------
-	//アップグレード強化
-	//maxShieldHealth = baseShieldHealth + pUpgrade.at(2) * shieldUpgRate;
+
+	//-------------シールド処理------------------
 	
 	//e弾VS Shield
 	if (player.isShieldAvailable())
@@ -185,25 +185,36 @@ void Game::update()
 	}
 
 
-	//-----Item処理------
+	//--------------アップグレードアイテム-------------------
 	for (auto it = itemArr.begin(); it != itemArr.end();)
 	{
+		//アイテムの移動
 		if (it->pos.r > StageInfo::earthR)
 		{
 			it->pos.r -= itemSpeed * deltaTime;
 		}
+
+		//衝突判定（プレイヤー）
 		Vec2 rectPos = OffsetCircular({ 0,0 }, it->pos);
 		Rect collider{ Arg::center(lround(rectPos.x),lround(rectPos.y)) ,20,20 };
 		if (collider.intersects(player.getCollider()))
 		{
-			pUpgrade.at(it->itemType)++;
+			player.addOnePointUpgrade(it->itemType);
 			it = itemArr.erase(it);
 			continue;
 		}
 		it++;
 	}
+	for (auto& town:townArr)
+	{
+		if (town.getCollider().intersects(player.getCollider()))
+		{
+			town.addUpgrade(player.getUpgradeCnt());
+			player.resetUpgrade();
+		}
+	}
 
-	//------Enemy処理--------
+	//---------------Enemy処理-----------------
 
 	//ランダムスポーン
 	eSpawnTimer += deltaTime;
@@ -268,16 +279,16 @@ void Game::update()
 		bool exsit = false;
 		for (auto i : step(townArr.size()))
 		{
-			/*if (it->collider.intersects(townArr.at(i).collider))
+			if (it->collider.intersects(townArr[i].getCollider()))
 			{
 				if (!getData().testMode)
 				{
-					townArr.at(i).hp.damage(eBulletDamage);
+					townArr[i].damage(it->damage);
 				}
 				it = eBulletArr.erase(it);
 				exsit = true;
 				break;
-			}*/
+			}
 		}
 		if (exsit)
 		{
@@ -324,7 +335,9 @@ void Game::update()
 		}
 	}
 
-	//カメラ計算
+
+	//------------------カメラ計算------------------
+	
 	//引数の座標はゲーム内ではなく、回転の処理をした後、スケールを変える前の画面上座標
 	camera.setTargetCenter(Circular{player.getR() + cameraOffsetY,0});
 	if (cameraMode)
@@ -438,8 +451,8 @@ void Game::draw() const
 	}
 
 	//-------UI------------
-
-	if (showInstructionsFlag)
+	//遊び方
+	if (showInstructionsFlag && !getData().testMode)
 	{
 		TextureAsset(U"howToPlayTex").scaled(1.3).drawAt(Scene::Center());
 	}
@@ -464,11 +477,24 @@ void Game::draw() const
 	}
 
 	//プレイヤー強化
-	for (auto i : step(pUpgrade.size()))
+	for (auto i : step(3))
 	{
 		Rect{ 810 + 100 * i,950,100,60 }.draw(Palette::Darkgray);
 		Rect{ 810 + 100 * i,950,100,60 }.drawFrame(5, Palette::Black);
-		FontAsset(U"townHPFont")(pUpgrade.at(i)).drawAt(860 + 100 * i, 980, Palette::Blue);
+		switch (i)
+		{
+		case 0:
+			FontAsset(U"townHPFont")(player.getUpgradeCnt().Attack).drawAt(860 + 100 * i, 980, Palette::Blue);
+			break;
+		case 1:
+			FontAsset(U"townHPFont")(player.getUpgradeCnt().Defense).drawAt(860 + 100 * i, 980, Palette::Blue);
+			break;
+		case 2:
+			FontAsset(U"townHPFont")(player.getUpgradeCnt().Special).drawAt(860 + 100 * i, 980, Palette::Blue);
+			break;
+		default:
+			break;
+		}
 	}
 	TextureAsset(U"Attack_Item").scaled(0.05).drawAt(830, 980);
 	TextureAsset(U"Protect_Item").scaled(0.05).drawAt(930, 980);
