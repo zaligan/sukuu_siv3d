@@ -4,17 +4,23 @@
 
 namespace ColliderDrawType
 {
-	/// @brief コライダーの描画種類を持つ列挙型です
-	enum DrawType
+	/// @brief コライダーの描画方法を持つ列挙型です
+	enum RenderOrder
 	{
 		//表示しません
 		None,
 
 		//Textureの上にフレームを表示します
-		Frame,
+		AboveFrame,
 
-		//Textureの上にすべて表示します
-		Fill
+		//Textureの上に塗りつぶして表示します
+		AboveFill,
+
+		//Textureの下にフレームを表示します
+		BelowFrame,
+
+		//Textureの下に塗りつぶして表示します
+		BelowFill,
 	};
 }
 
@@ -27,7 +33,7 @@ struct TexturedCollider
 	//テクスチャー
 	Texture texture;
 
-	//図形とテクスチャーの中心を合わせるオフセット値です
+	//図形に対してテクスチャーの中心を合わせるオフセット値です
 	Vec2 offsetPos;
 
 	//テクスチャーの大きさです
@@ -69,20 +75,32 @@ struct TexturedCollider
 	/// @param drawType コライダーの描画タイプを選択します
 	/// @param thickness コライダーの描画タイプがFrameの時の枠線の太さです
 	/// @param color コライダーの色です
-	void draw(ColliderDrawType::DrawType drawType, double thickness = 1.0, const ColorF& color = Palette::White)const
+	void draw(ColliderDrawType::RenderOrder drawType, double thickness = 1.0, const ColorF& color = Palette::White)const
 	{
-		texture.scaled(scaleOfTexture).drawAt(collider.center());
 		switch (drawType)
 		{
 		case ColliderDrawType::None:
+			texture.scaled(scaleOfTexture).drawAt(collider.center());
 			break;
 
-		case ColliderDrawType::Frame:
+		case ColliderDrawType::AboveFrame:
+			texture.scaled(scaleOfTexture).drawAt(collider.center());
 			collider.drawFrame(thickness, color);
 			break;
 
-		case ColliderDrawType::Fill:
+		case ColliderDrawType::AboveFill:
+			texture.scaled(scaleOfTexture).drawAt(collider.center());
 			collider.draw(color);
+			break;
+
+		case ColliderDrawType::BelowFrame:
+			collider.drawFrame(thickness,color);
+			texture.scaled(scaleOfTexture).drawAt(collider.center());
+			break;
+
+		case ColliderDrawType::BelowFill:
+			collider.draw(color);
+			texture.scaled(scaleOfTexture).drawAt(collider.center());
 			break;
 
 		default:
@@ -90,7 +108,7 @@ struct TexturedCollider
 		}
 	}
 
-	void draw(ColliderDrawType::DrawType d, const ColorF& color = Palette::White)const
+	void draw(ColliderDrawType::RenderOrder d, const ColorF& color = Palette::White)const
 	{
 		draw(d, 1.0, color);
 	}
