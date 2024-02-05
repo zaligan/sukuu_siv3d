@@ -31,7 +31,7 @@ public:
 	{
 		m_attackTimer += deltaTime;
 		m_hPBar.update();
-		m_attackLevel = Max(5, m_upgrade.Attack % 5);
+		m_attackLevel = Min(5, m_upgrade.Attack / 5);
 	}
 
 	void shot(Array<Bullet>& bulletArr)
@@ -79,6 +79,11 @@ public:
 		return m_hPBar.getHP();
 	}
 
+	void damage(double damage)
+	{
+		m_hPBar.damage(damage);
+	}
+
 	TownType::Type getTownType() const
 	{
 		return m_townType;
@@ -92,6 +97,13 @@ public:
 	void addUpgrade(Upgrade upg)
 	{
 		m_upgrade += upg;
+	}
+
+	/// @brief 衝突範囲を返します
+	/// @return 衝突範囲
+	Circle getCollider() const
+	{
+		return m_collider;
 	}
 
 private:

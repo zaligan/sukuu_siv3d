@@ -20,9 +20,6 @@ void Main()
 	//シーンマネージャーを作成
 	App manager;
 
-	//調整用無敵モード、通常プレイ時はコメントアウト
-	//manager.get()->testMode = true;
-
 	//Asset登録
 	TextReader reader{ U"asset-list.txt" };
 	if (not reader)
@@ -31,12 +28,10 @@ void Main()
 	}
 
 	String line;
-	//１行ずつ読み込む
 	while (reader.readLine(line))
 	{
-		//tab区切りでitemsに格納
 		const Array<String> items = line.split(U'\t');
-		//Fontの時は長さ４、その他は長さ３かどうかチェック
+		//Fontの時は長さ４、その他は長さ３
 		if ((items[0] == U"Font" && items.size() != 4) || (items[0] != U"Font" && items.size() != 3))
 		{
 			throw Error{ U"Invalid asset-list.txt" };
@@ -71,12 +66,19 @@ void Main()
 			continue;
 		}
 	}
+
+
 	//シーンの追加
 	manager.add<Title>(State::Title);
 	manager.add<Game>(State::Game);
 
+
+	//----開発用----
 	//Gameシーンから開始する場合このコメントを外す
 	manager.init(State::Game);
+	//調整用無敵モード、通常プレイ時はコメントアウト
+	manager.get()->testMode = true;
+
 
 	//メインループ
 	while (System::Update())
