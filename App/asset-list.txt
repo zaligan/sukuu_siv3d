@@ -24,3 +24,4 @@ Audio	eDeathAud	music/maou_se_8bit12.mp3
 Font	townHPFont	font/DotGothic16/DotGothic16-Regular.ttf	18
 Font	titleFont	font/DotGothic16/DotGothic16-Regular.ttf	40
 Font	gameOverFont	font/DotGothic16/DotGothic16-Regular.ttf	52
+Font	timeLimit	font/DotGothic16/DotGothic16-Regular.ttf	80
